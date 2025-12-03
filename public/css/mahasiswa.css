@@ -1105,7 +1105,7 @@ button.dropdown-item[type="submit"]::before {
 }
 /* Material Show Page Styles */
 .container-fluid {
-    max-width: 1200px;
+    max-width: 1500px !important;
     margin: 0 auto;
     padding: 1rem 2rem;
 }
@@ -2852,6 +2852,11 @@ button.dropdown-item[type="submit"]::before {
     color: #dc3545; /* Merah untuk tingkat Hard/Advanced */
 }
 
+.difficulty-star.parsons,
+.difficulty-item .parsons-star {
+    color: #17a2b8; /* Biru untuk tipe Parsons */
+}
+
 /* Styling untuk item kesulitan pada sidebar */
 .difficulty-item {
     display: flex;
@@ -2885,6 +2890,10 @@ button.dropdown-item[type="submit"]::before {
 
 .difficulty-item.active .hard-star {
     color: #dc3545;
+}
+
+.difficulty-item.active .parsons-star {
+    color: #17a2b8;
 }
 
 /* CSS untuk tingkat kesulitan di sidebar */
@@ -2932,10 +2941,15 @@ button.dropdown-item[type="submit"]::before {
     color: #dc3545 !important; /* Merah */
 }
 
+.parsons-star {
+    color: #17a2b8 !important; /* Biru */
+}
+
 /* Override warna ikon bintang pada item active */
 .menu-item.active .beginner-star,
 .menu-item.active .medium-star,
-.menu-item.active .hard-star {
+.menu-item.active .hard-star,
+.menu-item.active .parsons-star {
     color: inherit !important;
 }
 
@@ -2950,6 +2964,10 @@ button.dropdown-item[type="submit"]::before {
 
 .menu-item.sub-menu-item.active .hard-star {
     color: #dc3545 !important;
+}
+
+.menu-item.sub-menu-item.active .parsons-star {
+    color: #17a2b8 !important;
 }
 
 /* Styling untuk tampilan materi dan tingkat kesulitan */
@@ -3051,6 +3069,15 @@ button.dropdown-item[type="submit"]::before {
     font-weight: 500;
 }
 
+.difficulty-item.parsons {
+    border-left: 4px solid rgb(0, 191, 255);
+}
+
+.difficulty-item.active.parsons {
+    background-color: rgba(0, 191, 255, 0.15);
+    color: rgb(0, 191, 255);
+    font-weight: 500;
+}
 /* Hover effect untuk item kesulitan */
 .difficulty-item:hover {
     transform: translateX(5px);
@@ -3066,6 +3093,10 @@ button.dropdown-item[type="submit"]::before {
 
 .difficulty-item.hard:hover {
     background-color: rgba(220, 53, 69, 0.08);
+}
+
+.difficulty-item.parsons:hover {
+    background-color: rgba(0, 191, 255, 0.08);
 }
 
 /* Styling untuk ikon bintang */
@@ -3087,10 +3118,17 @@ button.dropdown-item[type="submit"]::before {
     text-shadow: 0 0 5px rgba(220, 53, 69, 0.4);
 }
 
+.parsons-star {
+    color: rgb(0, 191, 255) !important;
+    margin-right: 10px;
+    text-shadow: 0 0 5px rgba(0, 191, 255, 0.4);
+}
+
 /* Animasi untuk bintang kesulitan */
 .difficulty-item:hover .beginner-star,
 .difficulty-item:hover .medium-star,
-.difficulty-item:hover .hard-star {
+.difficulty-item:hover .hard-star,
+.difficulty-item:hover .parsons-star {
     transform: rotate(15deg) scale(1.2);
     transition: all 0.3s ease;
 }
@@ -3158,6 +3196,14 @@ button.dropdown-item[type="submit"]::before {
     box-shadow: 0 4px 8px rgba(0, 86, 179, 0.2);
 }
 
+.difficulty-item.parsons.active,
+.menu-item.sub-menu-item.active:has(.parsons-star) {
+    background-color: #0056b3;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 8px rgba(0, 86, 179, 0.2);
+}
+
 /* Hover styles */
 .difficulty-item:hover,
 .menu-item.sub-menu-item:hover {
@@ -3181,6 +3227,11 @@ button.dropdown-item[type="submit"]::before {
     margin-right: 10px;
 }
 
+.parsons-star {
+    color: rgb(0, 191, 255) !important; /* Biru */
+    margin-right: 10px;
+}
+
 /* Ensure stars keep their colors even in active state */
 .menu-item.sub-menu-item.active .beginner-star {
     color: #28a745 !important;
@@ -3194,13 +3245,19 @@ button.dropdown-item[type="submit"]::before {
     color: #dc3545 !important;
 }
 
+.menu-item.sub-menu-item.active .parsons-star {
+    color: rgb(0, 191, 255) !important;
+}
+
 /* Hover animations for stars */
 .difficulty-item:hover .beginner-star,
 .difficulty-item:hover .medium-star,
 .difficulty-item:hover .hard-star,
+.difficulty-item:hover .parsons-star,
 .menu-item.sub-menu-item:hover .beginner-star,
 .menu-item.sub-menu-item:hover .medium-star,
-.menu-item.sub-menu-item:hover .hard-star {
+.menu-item.sub-menu-item:hover .hard-star,
+.menu-item.sub-menu-item:hover .parsons-star {
     transform: rotate(15deg) scale(1.2);
     transition: all 0.3s ease;
 }

@@ -1,6 +1,6 @@
 `@extends('mahasiswa.layouts.app')
 
-@section('title', 'Latihan Soal PBO')
+@section('title', 'Latihan Soal PBO Parsons Problem 2D')
 
 @section('content')
 @if(auth()->check() && auth()->user()->role_id === 4)
@@ -29,7 +29,7 @@
 @endif
 
 <div class="dashboard-header text-center">
-    <h1 class="main-title">Latihan Soal PBO</h1>
+    <h1 class="main-title">Latihan Soal PBO Parsons Problem 2D</h1>
     <div class="title-underline"></div>
     <p class="subtitle mt-3">Uji pemahaman Anda dengan mengerjakan latihan soal untuk setiap materi</p>
 </div>

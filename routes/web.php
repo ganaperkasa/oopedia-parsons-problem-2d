@@ -26,7 +26,8 @@ use App\Http\Controllers\Mahasiswa\{
     QuestionController as MahasiswaQuestionController,
     MahasiswaController,
     MaterialQuestionController,
-    UeqSurveyController as MahasiswaUeqSurveyController
+    UeqSurveyController as MahasiswaUeqSurveyController,
+    ParsonsController
 };
 use App\Models\Material;
 use Illuminate\Http\Request;
@@ -47,7 +48,7 @@ use Illuminate\Support\Facades\DB;
 Route::get('/login', function () {
     if (auth()->check()) {
         $user = auth()->user();
-        
+
         if ($user->role_id <= 2) {
             return redirect()->route('admin.dashboard');
         } else if ($user->role_id == 3) {
@@ -56,7 +57,7 @@ Route::get('/login', function () {
             return redirect()->route('mahasiswa.materials.index');
         }
     }
-    
+
     // return redirect()->route('login');
 // })->name('mahasiswa.materials.index');
 });
@@ -68,7 +69,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [SessionsController::class, 'store']);
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('/register', [RegisteredUserController::class, 'store']);
-    
+
     // Guest login
     Route::get('/guest-login', [GuestLoginController::class, 'login'])->name('guest.login');
 });
@@ -88,17 +89,17 @@ Route::middleware('auth')->group(function () {
     // Pending Approval Route - accessible by any authenticated user
     Route::get('admin/pending-approval', [PendingApprovalController::class, 'index'])
         ->name('admin.pending-approval');
-        
+
     // Admin Routes (role 1 = superadmin, role 2 = admin)
     Route::middleware(['role:1|2', 'admin.approved'])->name('admin.')->prefix('admin')->group(function () {
         // Dashboard
         Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-        
+
         // Materials & Questions
         Route::resource('materials', AdminMaterialController::class);
         Route::resource('questions', AdminQuestionController::class);
         Route::resource('materials.questions', AdminQuestionController::class)->except(['show']);
-        
+
         // Students management
         Route::controller(AdminStudentController::class)->group(function () {
             Route::get('students', 'index')->name('students.index');
@@ -115,12 +116,12 @@ Route::middleware('auth')->group(function () {
             Route::get('/pending-admins', [AdminUserController::class, 'pendingAdmins'])->name('pending-admins');
             Route::post('/users/{user}/approve', [AdminUserController::class, 'approveAdmin'])->name('users.approve');
             Route::post('/users/{user}/reject', [AdminUserController::class, 'rejectAdmin'])->name('users.reject');
-            
+
             // User import
             Route::get('/users/import', [AdminUserController::class, 'showImportForm'])->name('users.import');
             Route::post('/users/import', [AdminUserController::class, 'processImport'])->name('users.process-import');
             Route::get('/users/download-template', [AdminUserController::class, 'downloadTemplate'])->name('users.download-template');
-            
+
             // User management
             Route::resource('users', AdminUserController::class)->except(['show']);
         });
@@ -152,17 +153,17 @@ Route::middleware('auth')->group(function () {
             Route::get('dashboard', [MahasiswaDashboardController::class, 'index'])->name('dashboard');
             Route::get('dashboard/in-progress', [MahasiswaDashboardController::class, 'inProgress'])->name('dashboard.in-progress');
             Route::get('dashboard/completed', [MahasiswaDashboardController::class, 'complete'])->name('dashboard.completed');
-            
+
             // Profile
             Route::get('profile', [MahasiswaProfileController::class, 'show'])->name('profile');
             Route::put('profile', [MahasiswaProfileController::class, 'update'])->name('profile.update');
-            
+
             // UEQ Survey routes
             Route::get('/ueq-survey', [MahasiswaUeqSurveyController::class, 'create'])->name('ueq.create');
             Route::post('/ueq-survey', [MahasiswaUeqSurveyController::class, 'store'])->name('ueq.store');
             Route::get('/ueq-survey/thankyou', [MahasiswaUeqSurveyController::class, 'thankyou'])->name('ueq.thankyou');
         });
-        
+
         // Materials (for both mahasiswa and guest)
         // Route::get('materials', [MahasiswaMaterialController::class, 'index'])->name('materials.index');
 
@@ -182,7 +183,7 @@ Route::middleware('auth')->group(function () {
         Route::get('materials/{material}/questions', [MaterialQuestionController::class, 'show'])
             ->name('materials.questions.show');
 
-        
+
         // Reset (conditional based on role)
         Route::post('materials/{material}/reset', function($material) {
             if (auth()->user()->role_id == 3) {
@@ -193,7 +194,7 @@ Route::middleware('auth')->group(function () {
                 return $controller->guestReset($material);
             }
         })->name('materials.reset');
-        
+
         // Questions
         Route::post('/questions/check-answer', [MahasiswaQuestionController::class, 'checkAnswer'])
             ->name('questions.check-answer');
@@ -219,20 +220,26 @@ Route::middleware('auth')->group(function () {
 Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('materials', [MahasiswaMaterialController::class, 'index'])->name('materials.index');
     Route::get('materials/{material}', [MahasiswaMaterialController::class, 'show'])->name('materials.show');
-    
+
     // Tambahan untuk latihan soal yang bisa diakses tamu
     Route::get('materials/questions', [MaterialQuestionController::class, 'index'])->name('materials.questions.index')
         ->withoutMiddleware('auth');
-    
+    Route::get('materials/questions/parsons-problem', [ParsonsController::class, 'index'])->name('materials.questions.parsons-problem.index')
+        ->withoutMiddleware('auth');
+
     // PERBAIKAN: Tambahkan withoutMiddleware('auth') pada semua route soal
     Route::get('materials/{material}/questions', [MaterialQuestionController::class, 'show'])
         ->name('materials.questions.show')
         ->withoutMiddleware('auth');
-    
+
     Route::get('materials/{material}/questions/levels', [MaterialQuestionController::class, 'showLevels'])
         ->name('materials.questions.levels')
         ->withoutMiddleware('auth');
-    
+
+    ROute::get('materials/{material}/questions/parsons-problem/levels', [ParsonsController::class, 'levels'])
+        ->name('materials.questions.parsons-problem.levels')
+        ->withoutMiddleware('auth');
+
     Route::get('materials/{material}/questions/review', [MaterialQuestionController::class, 'review'])
         ->name('materials.questions.review')
         ->withoutMiddleware('auth');
@@ -253,7 +260,7 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->middleware(['auth'])->group(func
 Route::fallback(function () {
     if (auth()->check()) {
         $user = auth()->user();
-        
+
         if ($user->role_id <= 2) {
             return redirect()->route('admin.dashboard');
         } else if ($user->role_id == 3) {
@@ -264,7 +271,7 @@ Route::fallback(function () {
                 ->with('info', 'Halaman yang Anda cari tidak tersedia untuk akun tamu.');
         }
     }
-    
+
     return redirect()->route('login');
 });
 

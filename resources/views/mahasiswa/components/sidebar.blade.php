@@ -161,7 +161,8 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="menu-item sub-menu-item"
+                <a href="{{ route('mahasiswa.materials.questions.parsons-problem.index') }}" class="menu-item
+                    {{ request()->is('mahasiswa/materials/questions/parsons-problem') ? 'active' : '' }}"
                 data-bs-toggle="tooltip" data-bs-placement="right" title="Lihat daftar latihan soal per materi">
                     <i class="fas fa-th"></i>
                     <span>Latihan soal Parsons Problem 2D</span>
@@ -229,6 +230,12 @@
                                 data-bs-toggle="tooltip" data-bs-placement="right" title="Soal tingkat sulit">
                                 <i class="fas fa-star hard-star"></i>
                                 <span>Hard</span>
+                            </a>
+                            <a href="{{ route('mahasiswa.materials.questions.parsons-problem.levels', ['material' => $materialItem->id, 'difficulty' => 'parsons']) }}"
+                                class="menu-item sub-menu-item {{ request()->query('difficulty') == 'parsons' ? 'active' : '' }}"
+                                data-bs-toggle="tooltip" data-bs-placement="right" title="Soal Latihan Parsons Problem 2D">
+                                <i class="fas fa-star parsons-star"></i>
+                                <span>Parsons Problem 2D</span>
                             </a>
                         </div>
                     @endif

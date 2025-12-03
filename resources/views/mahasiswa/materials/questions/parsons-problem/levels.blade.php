@@ -5,20 +5,9 @@
 @section('content')
 <div class="container-fluid">
     <div class="dashboard-header text-center">
-        <h1 class="main-title">Level Soal: {{ $material->title }}</h1>
+        <h1 class="main-title">Soal Parsons Problem 2D: {{ $material->title }}</h1>
         <div class="title-underline"></div>
 
-        <!-- Add difficulty selector -->
-        <div class="difficulty-selector mb-4">
-            <form method="GET" action="{{ route('mahasiswa.materials.questions.levels', $material) }}" class="d-flex justify-content-center align-items-center">
-                <label class="me-2">Tingkat Kesulitan:</label>
-                <select name="difficulty" class="form-select" onchange="this.form.submit()" style="width: auto;">
-                    <option value="beginner" {{ $difficulty == 'beginner' ? 'selected' : '' }}>Beginner</option>
-                    <option value="medium" {{ $difficulty == 'medium' ? 'selected' : '' }}>Medium</option>
-                    <option value="hard" {{ $difficulty == 'hard' ? 'selected' : '' }}>Hard</option>
-                </select>
-            </form>
-        </div>
 
         <!-- Display current difficulty if filtered -->
         @if($difficulty != 'all')
@@ -28,6 +17,7 @@
         </div>
         @endif
     </div>
+
 
     <div class="level-container">
         <!-- Tambahkan peringatan tentang sistem penilaian hanya untuk user mahasiswa (bukan tamu) -->
@@ -41,6 +31,21 @@
                 </div>
             </div>
         @endif
+
+        <!-- Indikator Nomor Soal -->
+    <div class="question-indicators mb-4">
+        <div class="row g-2">
+            @foreach($questions as $index => $question)
+                <div class="col-auto">
+                    <div class="question-box {{ $question->is_answered ? 'answered' : 'unanswered' }}"
+                         data-question-id="{{ $question->id }}"
+                         onclick="loadQuestion({{ $question->id }})">
+                        {{ $index + 1 }}
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
 
         <div class="level-legend mb-4">
             <div class="legend-title mb-3">Keterangan:</div>
@@ -72,56 +77,53 @@
             </div>
         </div>
 
-        <div class="level-header text-center mb-5">
-            <div class="start-text">
-                <span>START</span>
-                <div class="start-line"></div>
-            </div>
+        <!-- Area Parsons Problem -->
+    <div class="parsons-container card shadow-sm">
+        <div class="card-header text-white" style="background: linear-gradient(135deg, #004E98 0%, #0074D9 100%);">
         </div>
+        <div class="card-body">
+            <!-- Pertanyaan -->
+            <div class="question-section mb-4">
+                <h6 class="fw-bold">Soal:</h6>
+                <p id="question-text">Susun kode berikut dengan urutan yang benar...</p>
+            </div>
+
+            <!-- Area Drag & Drop -->
+            <div class="row">
+                <!-- Code Blocks -->
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3">Blok Kode:</h6>
+                    <div id="code-blocks" class="code-blocks-area p-3 border rounded bg-light">
+                        <!-- Akan diisi dengan JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Answer Area -->
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3">Jawaban Anda:</h6>
+                    <div id="answer-area" class="answer-area p-3 border rounded bg-white" style="min-height: 300px;">
+                        <p class="text-muted text-center">Drag blok kode ke sini</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 d-flex justify-content-between">
+                <button type="button" class="btn btn-warning" onclick="resetAnswer()">
+                    <i class="fas fa-redo me-2"></i>Reset
+                </button>
+                <button type="button" class="btn btn-success" onclick="submitAnswer()">
+                    <i class="fas fa-check me-2"></i>Submit Jawaban
+                </button>
+            </div>
+
+            <!-- Feedback Area -->
+            <div id="feedback-area" class="mt-3"></div>
+        </div>
+    </div>
 
         <div class="level-map">
-            <!-- SVG untuk jalur -->
-            <svg class="level-paths" width="100%" height="100%" style="position: absolute; top: 0; left: 0; z-index: 0;">
-                <!-- Jalur akan ditambahkan secara dinamis dengan JavaScript -->
-            </svg>
 
-            @foreach($levels as $index => $level)
-                <div class="level-row {{ $index % 3 == 0 ? 'center' : ($index % 3 == 1 ? 'left' : 'right') }}">
-                    <div class="level-item {{ $level['status'] }}" data-level="{{ $level['level'] }}" data-question-id="{{ $level['question_id'] }}" {{ $level['status'] === 'unlocked' ? 'id=unlockedLevel' : '' }}>
-                        @if($level['status'] === 'locked')
-                            <div class="level-circle">
-                                <span class="level-number">{{ $level['level'] }}</span>
-                            </div>
-                        @elseif($level['status'] === 'completed')
-                            <div class="level-circle completed">
-                                <span class="level-number">{{ $level['level'] }}</span>
-                                <i class="fas fa-check-circle completed-icon"></i>
-                            </div>
-                        @else
-                            <a href="{{ route('mahasiswa.materials.questions.show', [
-                                'material' => $material->id,
-                                'question' => $level['question_id'],
-                                'difficulty' => $difficulty
-                            ]) }}" class="level-link">
-                                <div class="level-circle unlocked">
-                                    <span class="level-number">{{ $level['level'] }}</span>
-                                </div>
-                            </a>
-                        @endif
-                        <div class="level-difficulty {{ $level['difficulty'] }}">
-                            {{ ucfirst($level['difficulty']) }}
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-
-            <div class="level-row center">
-                <div class="level-item trophy {{ count(array_filter($levels, function($level) { return $level['status'] !== 'completed'; })) === 0 ? 'completed' : 'locked' }}">
-                    <div class="level-circle trophy-circle">
-                        <i class="fas fa-trophy trophy-icon"></i>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="level-actions mt-4">
@@ -133,6 +135,207 @@
 </div>
 
 <style>
+    /* Question Indicators */
+.question-indicators {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.question-box {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.question-box.unanswered {
+    background: #dc3545;
+    color: white;
+}
+
+.question-box.answered {
+    background: #28a745;
+    color: white;
+}
+
+.question-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.question-box.active {
+    border: 3px solid #007bff;
+    transform: scale(1.1);
+}
+
+/* Parsons Problem Container */
+.parsons-container {
+    margin-bottom: 30px;
+}
+
+.code-blocks-area,
+.answer-area {
+    min-height: 300px;
+}
+
+.code-block {
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    cursor: move;
+    font-family: 'Courier New', monospace;
+    transition: all 0.2s ease;
+}
+
+.code-block:hover {
+    background: #f8f9fa;
+    border-color: #007bff;
+    transform: translateX(5px);
+}
+
+.code-block.dragging {
+    opacity: 0.5;
+}
+
+.answer-area .code-block {
+    cursor: move;
+    background: #e7f3ff;
+    border-color: #007bff;
+}
+
+.drop-placeholder {
+    border: 2px dashed #6c757d;
+    background: #f8f9fa;
+    height: 50px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+}
+    .body {
+        background: #f4f6f9;
+        font-family: Arial, sans-serif;
+    }
+
+    .cbt-container {
+        width: 100%;
+        max-width: 1100px;
+        margin: 30px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
+    }
+
+    /* HEADER CBT */
+    .cbt-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #ddd;
+    }
+
+    .cbt-title {
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    /* NAVIGASI NOMOR CBT */
+    .question-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .question-box {
+        width: 45px;
+        height: 45px;
+        background: #eaeaea;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+        color: #333;
+    }
+
+    .question-box:hover {
+        background: #dcdcdc;
+        transform: scale(1.05);
+    }
+
+    .question-active {
+        background: #3498db !important;
+        border-color: #2980b9 !important;
+        color: white !important;
+    }
+
+    .question-answered {
+        background: #2ecc71 !important;
+        border-color: #27ae60 !important;
+        color: white !important;
+    }
+
+    /* AREA SOAL */
+    .question-body {
+        padding: 20px;
+        background: #fdfdfd;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    /* DRAG ITEMS */
+    .drag-item {
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #ccc;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        cursor: grab;
+    }
+
+    .drag-item:hover {
+        background: #f7f7f7;
+    }
+
+    .cbt-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .cbt-btn {
+        padding: 12px 20px;
+        border-radius: 6px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+    }
+
+    .cbt-next {
+        background: #3498db;
+        color: white;
+    }
+
+    .cbt-prev {
+        background: #95a5a6;
+        color: white;
+    }
     .level-container {
         position: relative;
         background-color: #f8f9fa;
@@ -834,7 +1037,7 @@
 </style>
 
 @push('scripts')
-<script>
+{{-- <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Fungsi untuk menggambar jalur peta
     function drawTreasureMap() {
@@ -1185,6 +1388,164 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 100);
             }
         }
+    }
+});
+</script> --}}
+
+<script>
+let currentQuestion = null;
+let codeBlocks = [];
+let answerOrder = [];
+
+// Load Question
+function loadQuestion(questionId) {
+    // Update active indicator
+    document.querySelectorAll('.question-box').forEach(box => {
+        box.classList.remove('active');
+    });
+    document.querySelector(`[data-question-id="${questionId}"]`).classList.add('active');
+
+    // Fetch question data (simulasi - ganti dengan AJAX call)
+    fetch(`/api/questions/${questionId}`)
+        .then(response => response.json())
+        .then(data => {
+            currentQuestion = data;
+            displayQuestion(data);
+        });
+}
+
+// Display Question
+function displayQuestion(question) {
+    document.getElementById('question-title').textContent = question.title;
+    document.getElementById('question-text').textContent = question.description;
+
+    // Clear areas
+    document.getElementById('code-blocks').innerHTML = '';
+    document.getElementById('answer-area').innerHTML = '<p class="text-muted text-center">Drag blok kode ke sini</p>';
+    document.getElementById('feedback-area').innerHTML = '';
+
+    // Shuffle and display code blocks
+    codeBlocks = shuffleArray([...question.code_blocks]);
+    displayCodeBlocks();
+}
+
+// Display Code Blocks
+function displayCodeBlocks() {
+    const container = document.getElementById('code-blocks');
+    container.innerHTML = '';
+
+    codeBlocks.forEach((block, index) => {
+        const div = document.createElement('div');
+        div.className = 'code-block';
+        div.draggable = true;
+        div.dataset.blockId = index;
+        div.textContent = block;
+
+        div.addEventListener('dragstart', handleDragStart);
+        div.addEventListener('dragend', handleDragEnd);
+
+        container.appendChild(div);
+    });
+}
+
+// Drag and Drop Handlers
+function handleDragStart(e) {
+    this.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
+    e.dataTransfer.setData('blockId', this.dataset.blockId);
+}
+
+function handleDragEnd(e) {
+    this.classList.remove('dragging');
+}
+
+// Setup Answer Area Drop Zone
+document.addEventListener('DOMContentLoaded', function() {
+    const answerArea = document.getElementById('answer-area');
+
+    answerArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    });
+
+    answerArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        const blockId = e.dataTransfer.getData('blockId');
+        const content = e.dataTransfer.getData('text/html');
+
+        // Remove placeholder
+        const placeholder = answerArea.querySelector('.text-muted');
+        if (placeholder) placeholder.remove();
+
+        // Create answer block
+        const div = document.createElement('div');
+        div.className = 'code-block';
+        div.innerHTML = content;
+        div.dataset.blockId = blockId;
+
+        answerArea.appendChild(div);
+        answerOrder.push(blockId);
+
+        // Remove from code blocks
+        document.querySelector(`#code-blocks [data-block-id="${blockId}"]`).remove();
+    });
+});
+
+// Reset Answer
+function resetAnswer() {
+    answerOrder = [];
+    displayQuestion(currentQuestion);
+}
+
+// Submit Answer
+function submitAnswer() {
+    const feedbackArea = document.getElementById('feedback-area');
+
+    // Validate (simulasi - ganti dengan logic sebenarnya)
+    if (answerOrder.length === 0) {
+        feedbackArea.innerHTML = '<div class="alert alert-warning">Silakan susun kode terlebih dahulu!</div>';
+        return;
+    }
+
+    // Submit to server
+    fetch('/api/submit-answer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            question_id: currentQuestion.id,
+            answer: answerOrder
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.correct) {
+            feedbackArea.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>Jawaban Anda Benar!</div>';
+            // Update indicator
+            document.querySelector(`[data-question-id="${currentQuestion.id}"]`).classList.remove('unanswered');
+            document.querySelector(`[data-question-id="${currentQuestion.id}"]`).classList.add('answered');
+        } else {
+            feedbackArea.innerHTML = '<div class="alert alert-danger"><i class="fas fa-times-circle me-2"></i>Jawaban Anda Salah. Coba lagi!</div>';
+        }
+    });
+}
+
+// Utility: Shuffle Array
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Load first question on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const firstQuestion = document.querySelector('.question-box');
+    if (firstQuestion) {
+        loadQuestion(firstQuestion.dataset.questionId);
     }
 });
 </script>

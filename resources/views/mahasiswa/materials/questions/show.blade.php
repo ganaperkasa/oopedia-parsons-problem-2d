@@ -12,11 +12,11 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         margin-bottom: 30px;
     }
-    
+
     .materi-card-body {
         padding: 25px;
     }
-    
+
     .question-text {
         font-size: 16px;
         line-height: 1.5;
@@ -25,7 +25,7 @@
         border-radius: 8px;
         margin-bottom: 15px;
     }
-    
+
     .answer-option {
         transition: all 0.2s ease;
         cursor: pointer;
@@ -33,11 +33,11 @@
         padding: 10px !important;
         margin-bottom: 8px !important;
     }
-    
+
     .answer-option:hover {
         background-color: #e9ecef;
     }
-    
+
     /* Enhanced feedback styling */
     .exercise-feedback {
         max-width: 600px;
@@ -48,12 +48,12 @@
         overflow: hidden;
         color: white;
     }
-    
+
     .feedback-container {
         padding: 30px;
         text-align: center;
     }
-    
+
     .feedback-icon {
         margin: 0 auto 20px;
         width: 100px;
@@ -63,34 +63,34 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     .feedback-icon.success {
         background-color: #00c07f;
     }
-    
+
     .feedback-icon.error {
         background-color: #ff5a5a;
     }
-    
+
     .feedback-icon i {
         font-size: 50px;
         color: white;
     }
-    
+
     .feedback-status h3 {
         font-size: 28px;
         font-weight: 700;
         margin-bottom: 20px;
     }
-    
+
     .text-success {
         color: #00c07f !important;
     }
-    
+
     .text-danger {
         color: #ff5a5a !important;
     }
-    
+
     .explanation-box {
         background-color: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
@@ -98,107 +98,107 @@
         margin-top: 20px;
         padding: 15px;
     }
-    
+
     .explanation-box h5 {
         color: white;
         font-size: 18px;
         margin-bottom: 10px;
     }
-    
+
     .feedback-actions {
         margin-top: 25px;
     }
-    
+
     .feedback-actions .btn {
         padding: 10px 25px;
         font-weight: 500;
         border-radius: 8px;
         transition: all 0.2s ease;
     }
-    
+
     .feedback-actions .btn:hover {
         transform: translateY(-2px);
     }
-    
+
     .btn-outline-light {
         color: white;
         border-color: rgba(255, 255, 255, 0.5);
     }
-    
+
     .btn-outline-light:hover {
         background-color: rgba(255, 255, 255, 0.1);
         border-color: white;
     }
-    
+
     .btn-success {
         background-color: #00c07f;
         border-color: #00c07f;
     }
-    
+
     .btn-success:hover {
         background-color: #00a06a;
         border-color: #00a06a;
     }
-    
+
     /* Filter buttons */
     .filter-buttons {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
     }
-    
+
     .filter-buttons .btn {
         border-radius: 8px;
         padding: 8px 20px;
         font-weight: 500;
         transition: all 0.2s ease;
     }
-    
+
     .filter-buttons .btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-    
+
     /* Button colors */
     .btn-primary, .btn-outline-primary:hover {
         background-color: #0d6efd;
         border-color: #0d6efd;
     }
-    
+
     .btn-success, .btn-outline-success:hover {
         background-color: #198754;
         border-color: #198754;
     }
-    
+
     .btn-warning, .btn-outline-warning:hover {
         background-color: #ffc107;
         border-color: #ffc107;
         color: #212529;
     }
-    
+
     .btn-danger, .btn-outline-danger:hover {
         background-color: #dc3545;
         border-color: #dc3545;
     }
-    
+
     /* Trophy styles */
     .trophy-circle {
         background-color: #444;
         transition: all 0.3s ease;
     }
-    
+
     .trophy-icon-disabled {
         color: #777;
         font-size: 20px;
     }
-    
+
     .trophy-icon {
         color: #FFD700;
         font-size: 20px;
         text-shadow: 0 0 10px #FFD700;
         animation: glow 1.5s infinite alternate;
     }
-    
+
     @keyframes glow {
         from {
             text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700;
@@ -207,13 +207,13 @@
             text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700;
         }
     }
-    
+
     .trophy.completed .trophy-circle {
         background-color: #444;
         border: 2px solid #FFD700;
         box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
     }
-    
+
     #tryAgainBtn.btn-warning:hover {
         background-color: #ffc107; /* Same as the default */
         color: #212529;
@@ -221,7 +221,7 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
     }
-    
+
     /* Improved code block formatting with less spacing */
     .question-text pre,
     .question-text code {
@@ -234,7 +234,7 @@
         white-space: pre-wrap;
         font-size: 14px; /* Slightly smaller font for code */
     }
-    
+
     /* Make sure all images display properly */
     .question-text img,
     .answer-text img {
@@ -242,23 +242,23 @@
         height: auto;
         margin: 0.5rem 0;
     }
-    
+
     /* Reduce spacing in paragraphs */
     .question-text p,
     .answer-text p {
         margin-bottom: 0.75rem;
     }
-    
+
     /* Fix whitespace in content with reduced spacing */
     .whitespace-pre-wrap {
         white-space: pre-wrap !important;
     }
-    
+
     /* Tighten headings */
     h5.mb-3 {
         margin-bottom: 10px !important;
     }
-    
+
     /* More compact question header */
     .question-header {
         margin-bottom: 15px !important;
@@ -287,11 +287,11 @@
 
     @if(auth()->check() && auth()->user()->role_id === 4)
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>Mode Tamu Aktif!</strong> 
-            Anda hanya dapat melihat sebagian dari soal latihan ini. Untuk akses penuh, silakan 
-            <a href="{{ route('login') }}" class="alert-link" onclick="event.preventDefault(); document.getElementById('guest-logout-login-form').submit();">login</a> 
-            atau 
-            <a href="{{ route('register') }}" class="alert-link" onclick="event.preventDefault(); document.getElementById('guest-logout-register-form').submit();">daftar</a> 
+            <strong>Mode Tamu Aktif!</strong>
+            Anda hanya dapat melihat sebagian dari soal latihan ini. Untuk akses penuh, silakan
+            <a href="{{ route('login') }}" class="alert-link" onclick="event.preventDefault(); document.getElementById('guest-logout-login-form').submit();">login</a>
+            atau
+            <a href="{{ route('register') }}" class="alert-link" onclick="event.preventDefault(); document.getElementById('guest-logout-register-form').submit();">daftar</a>
             sebagai mahasiswa.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -356,7 +356,7 @@ function initializeQuestionForm() {
     const explanationText = document.getElementById('explanationText');
     const isGuest = {{ auth()->check() ? (auth()->user()->role_id === 4 ? 'true' : 'false') : 'true' }};
     const currentQuestionNumber = {{ $currentQuestionNumber ?? 1 }};
-    
+
     // Fungsi untuk menampilkan pesan semua soal telah terjawab
     function showAllQuestionsCompleted() {
         // Sembunyikan form soal dan feedback
@@ -366,7 +366,7 @@ function initializeQuestionForm() {
         if (feedbackElement) {
             feedbackElement.style.display = 'none';
         }
-        
+
         // Tampilkan pesan semua soal telah terjawab
         const questionContainer = document.getElementById('questionContainer');
         if (questionContainer) {
@@ -389,18 +389,18 @@ function initializeQuestionForm() {
             `;
         }
     }
-    
+
     if (questionForm) {
         questionForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             if (checkAnswerBtn) {
                 checkAnswerBtn.disabled = true;
                 checkAnswerBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Memeriksa...';
             }
-            
+
             const formData = new FormData(this);
-            
+
             fetch(this.action, {
                 method: 'POST',
                 body: formData,
@@ -422,7 +422,7 @@ function initializeQuestionForm() {
             });
         });
     }
-    
+
     // Make the entire answer option clickable
     const answerOptions = document.querySelectorAll('.answer-option');
     answerOptions.forEach(option => {
@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Jika tidak ada form soal, berarti semua soal sudah terjawab
     const questionForm = document.getElementById('questionForm');
     const noQuestionsMessage = document.querySelector('.alert.alert-info');
-    
+
     if (!questionForm && noQuestionsMessage) {
         // Ganti pesan default dengan tampilan yang lebih menarik
         const materiCardBody = document.querySelector('.materi-card-body');
@@ -464,14 +464,14 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
     }
-    
+
     // Initialize form
     initializeQuestionForm();
 });
 
 function showQuestionReview(difficulty) {
     const mainContainer = document.querySelector('.container-fluid');
-    
+
     // Show loading state
     mainContainer.innerHTML = `
         <div class="text-center my-5">
@@ -481,10 +481,10 @@ function showQuestionReview(difficulty) {
             <p class="mt-3">Memuat review soal...</p>
         </div>
     `;
-    
+
     // Fetch the review content
     const url = `{{ route('mahasiswa.materials.questions.review', $material->id) }}${difficulty && difficulty !== 'all' ? `?difficulty=${difficulty}` : ''}`;
-    
+
     fetch(url, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -495,7 +495,7 @@ function showQuestionReview(difficulty) {
         mainContainer.innerHTML = `
             <h1 class="materi-heading">Review Soal: {{ $material->title }}</h1>
             <div class="heading-underline mb-4"></div>
-            
+
             <div class="row">
                 <div class="col-12">
                     <div class="card shadow-sm">
@@ -519,7 +519,7 @@ function showQuestionReview(difficulty) {
         mainContainer.innerHTML = `
             <div class="alert alert-danger">
                 <i class="fas fa-exclamation-circle me-2"></i>
-                Terjadi kesalahan saat memuat review soal. 
+                Terjadi kesalahan saat memuat review soal.
                 <a href="{{ route('mahasiswa.materials.show', $material->id) }}" class="btn btn-sm btn-primary ms-3">
                     Kembali ke Materi
                 </a>
@@ -549,11 +549,11 @@ function submitAnswer() {
     .then(response => response.json())
     .then(data => {
         const attemptCount = data.attempts;
-        
+
         // Calculate potential score based on attempts
         let potentialScore = 0;
         const difficulty = '{{ $currentQuestion->difficulty }}';
-        
+
         if (difficulty === 'beginner') {
             potentialScore = attemptCount === 0 ? 3 : (attemptCount === 1 ? 2 : 1);
         } else if (difficulty === 'medium') {
@@ -581,7 +581,7 @@ function submitAnswer() {
         .then(response => response.json())
         .then(result => {
             showFeedback(result, potentialScore, attemptCount + 1);
-            
+
             if (submitButton && result.status !== 'success') {
                 submitButton.disabled = false;
                 submitButton.innerHTML = '<i class="fas fa-check-circle me-2"></i>Periksa Jawaban';
@@ -614,7 +614,7 @@ function showFeedback(data) {
     const tryAgainBtn = document.getElementById('tryAgainBtn');
     const nextQuestionBtn = document.getElementById('nextQuestionBtn');
     const questionForm = document.getElementById('questionForm');
-    
+
     // Set status dan icon
     feedbackStatus.innerHTML = `<h3 class="${data.status === 'success' ? 'text-success' : 'text-danger'}">${data.message}</h3>`;
     feedbackIcon.className = `feedback-icon ${data.status === 'success' ? 'success' : 'error'}`;
@@ -629,15 +629,15 @@ function showFeedback(data) {
             feedbackElement.classList.add('alert-success');
             feedbackIcon.className = 'fas fa-check-circle';
             feedbackStatus.textContent = data.message;
-            
+
             // Redirect setelah 1.5 detik
             setTimeout(() => {
                 window.location.href = data.redirect_url;
             }, 1500);
-            
+
             return; // Penting: hentikan eksekusi di sini
         }
-        
+
         // Kode penanganan normal lainnya
         tryAgainBtn.style.display = 'none';
         nextQuestionBtn.style.display = 'inline-block';
@@ -650,11 +650,11 @@ function showFeedback(data) {
     } else {
         tryAgainBtn.style.display = 'inline-block';
         nextQuestionBtn.style.display = 'none';
-        
+
         tryAgainBtn.onclick = () => {
             feedbackElement.style.display = 'none';
             questionForm.style.display = 'block';
-            
+
             const checkAnswerBtn = document.getElementById('checkAnswerBtn');
             if (checkAnswerBtn) {
                 checkAnswerBtn.disabled = false;
@@ -671,23 +671,23 @@ function showFeedback(data) {
 $(document).ready(function() {
     $('#questionForm').on('submit', function(e) {
         e.preventDefault();
-        
+
         const formData = new FormData(this);
         const currentDifficulty = '{{ request()->query('difficulty') }}';
         formData.append('difficulty', currentDifficulty);
-        
+
         $.ajax({
             url: $(this).attr('action'),
             method: 'POST',
             data: $(this).serialize() + '&difficulty=' + currentDifficulty,
             success: function(response) {
                 console.log("Answer response:", response);
-                
+
                 if (response.status === 'success') {
                     // Show success feedback
-                    showFeedback(true, response.message, response.selectedAnswerText, 
+                    showFeedback(true, response.message, response.selectedAnswerText,
                                  response.correctAnswerText, response.explanation);
-                    
+
                     // Then redirect after a delay
                     setTimeout(function() {
                         if (response.hasNextQuestion && response.nextUrl) {
@@ -703,7 +703,7 @@ $(document).ready(function() {
                     }, 2000);
                 } else {
                     // Handle incorrect answer
-                    showFeedback(false, response.message, response.selectedAnswerText, 
+                    showFeedback(false, response.message, response.selectedAnswerText,
                                  response.correctAnswerText, response.explanation);
                 }
             }
@@ -715,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add console logs for debugging
     console.log("DOM loaded on question page");
     console.log("Tutorial status:", sessionStorage.getItem('question_answer_tutorial_complete'));
-    
+
     // Check if this is first time visiting a question
     if (!sessionStorage.getItem('question_answer_tutorial_complete')) {
         console.log("Starting question tutorial in 1 second");
@@ -726,24 +726,24 @@ document.addEventListener('DOMContentLoaded', function() {
 function startQuestionAnswerTutorial() {
     // Define the tutorial steps
     console.log("Tutorial function called");
-    
+
     // Check if question elements exist
     const questionText = document.querySelector('.question-text');
     const optionsContainer = document.querySelector('.options-container');
     const checkAnswerBtn = document.getElementById('checkAnswerBtn');
-    
+
     console.log("Found elements:", {
         questionText: !!questionText,
         optionsContainer: !!optionsContainer,
         checkAnswerBtn: !!checkAnswerBtn
     });
-    
+
     // Only proceed if elements exist
     if (!questionText || !optionsContainer || !checkAnswerBtn) {
         console.log("Missing required elements for tutorial");
         return;
     }
-    
+
     const steps = [
         {
             intro: "Sekarang Anda berada di halaman soal. Mari kita pelajari cara menjawab soal."
@@ -777,13 +777,13 @@ function startQuestionAnswerTutorial() {
             prevLabel: 'Sebelumnya',
             doneLabel: 'Mulai Menjawab'
         });
-        
+
         tour.oncomplete(function() {
             // Mark as completed in session storage
             sessionStorage.setItem('question_answer_tutorial_complete', 'true');
             console.log("Tutorial completed and marked in session storage");
         });
-        
+
         tour.start();
         console.log("Tutorial started successfully");
     } catch (error) {
@@ -795,18 +795,18 @@ function startQuestionAnswerTutorial() {
 document.addEventListener('DOMContentLoaded', function() {
     // Process all question-text elements to render HTML properly
     const questionTextElements = document.querySelectorAll('.question-text');
-    
+
     questionTextElements.forEach(element => {
         // Only apply if the content appears to be raw HTML
-        if (element.textContent.includes('&lt;') || 
-            element.textContent.includes('<p class="whitespace-pre-wrap') || 
+        if (element.textContent.includes('&lt;') ||
+            element.textContent.includes('<p class="whitespace-pre-wrap') ||
             element.textContent.includes('<div class="relative group/copy')) {
-            
+
             // Extract the content and re-render it properly
             let rawHtml = element.textContent;
             element.innerHTML = rawHtml;
         }
-        
+
         // Ensure code blocks have proper styling
         const codeBlocks = element.querySelectorAll('pre');
         codeBlocks.forEach(block => {
@@ -831,15 +831,15 @@ document.addEventListener('DOMContentLoaded', function() {
 function redirectToLevelWithScroll(levelUrl) {
     // Save status that question was answered correctly
     localStorage.setItem('questionCompleted', 'true');
-    
+
     // If levelUrl not provided, use default URL
     if (!levelUrl) {
         levelUrl = "{{ route('mahasiswa.materials.questions.levels', ['material' => $material->id, 'difficulty' => request()->query('difficulty')]) }}";
     }
-    
+
     // Add scroll parameter
     const separator = levelUrl.includes('?') ? '&' : '?';
     window.location.href = `${levelUrl}${separator}scroll=true`;
 }
 </script>
-@endpush 
+@endpush
