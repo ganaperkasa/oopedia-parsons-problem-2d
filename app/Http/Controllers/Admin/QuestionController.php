@@ -75,57 +75,68 @@ class QuestionController extends Controller
 
     public function store(Request $request, Material $material = null)
 {
-    // Validasi dasar untuk semua field kecuali answers
+    // Validasi dasar
     $baseValidation = [
         'question_text' => 'required|string',
-        'question_type' => 'required|in:radio_button,drag_and_drop,fill_in_the_blank',
+        'question_type' => 'required|in:radio_button,drag_and_drop,fill_in_the_blank,parsons_problem_2d', // ← PERBAIKAN
         'difficulty' => 'required|in:beginner,medium,hard',
         'material_id' => 'required|exists:materials,id',
     ];
-    
-    // Validasi khusus untuk answers berdasarkan tipe soal
-    if ($request->question_type === 'fill_in_the_blank') {
-        $answersValidation = ['answers' => 'required|array|min:1'];
-    } else {
-        $answersValidation = ['answers' => 'required|array|min:2'];
-    }
-    
-    // Gabungkan validasi
-    $validationRules = array_merge($baseValidation, $answersValidation);
-    
-    // Tambahkan validasi untuk setiap jawaban
-    $validationRules['answers.*.answer_text'] = 'required|string';
-    
-    $request->validate($validationRules);
 
-    // Proses correct_answer untuk radio_button dan fill_in_the_blank
+    // Validasi khusus berdasarkan tipe soal
+    switch ($request->question_type) {
+
+        case 'parsons_problem_2d': // ← PERBAIKAN
+            $answersValidation = [
+                'answers' => 'required|array|min:1',
+                'answers.*.drag_source' => 'required|string',
+                'answers.*.drag_target' => 'required|string',
+            ];
+            break;
+
+        case 'fill_in_the_blank':
+            $answersValidation = [
+                'answers' => 'required|array|min:1',
+                'answers.*.answer_text' => 'required|string',
+            ];
+            break;
+
+        default: // radio_button, drag_and_drop
+            $answersValidation = [
+                'answers' => 'required|array|min:2',
+                'answers.*.answer_text' => 'required|string',
+            ];
+            break;
+    }
+
+    $request->validate(array_merge($baseValidation, $answersValidation));
+
     $answers = $request->answers;
-    
+
+    // ================================
+    // KHUSUS RADIO & FILL IN THE BLANK
+    // ================================
     if (in_array($request->question_type, ['radio_button', 'fill_in_the_blank'])) {
-        if ($request->has('correct_answer')) {
-            $correctIndex = $request->correct_answer;
-            
-            // Create a new array instead of trying to modify by reference
-            $processedAnswers = [];
-            foreach ($answers as $index => $answer) {
-                $answer['is_correct'] = ($index == $correctIndex) ? 1 : 0;
-                $processedAnswers[] = $answer;
-            }
-            $answers = $processedAnswers;
-            
-            // Pastikan hanya ada 1 jawaban benar
-            $correctAnswersCount = collect($answers)->sum(function ($answer) {
-                return $answer['is_correct'];
-            });
-            
-            if ($correctAnswersCount !== 1) {
-                return redirect()->back()->withInput()->with('error', ucfirst(str_replace('_', ' ', $request->question_type)) . ' questions must have exactly one correct answer.');
-            }
-        } else {
+
+        if (!$request->has('correct_answer')) {
             return redirect()->back()->withInput()->with('error', 'Please select the correct answer.');
+        }
+
+        $correctIndex = $request->correct_answer;
+
+        foreach ($answers as $idx => &$answer) {
+            $answer['is_correct'] = ($idx == $correctIndex) ? 1 : 0;
+        }
+
+        // Pastikan hanya 1 jawaban benar
+        if (collect($answers)->where('is_correct', 1)->count() !== 1) {
+            return redirect()->back()->withInput()->with('error', 'Must have exactly one correct answer.');
         }
     }
 
+    // ================================
+    // SIMPAN SOAL
+    // ================================
     $question = Question::create([
         'question_text' => $request->question_text,
         'question_type' => $request->question_type,
@@ -134,15 +145,20 @@ class QuestionController extends Controller
         'created_by' => auth()->id(),
     ]);
 
+    // ================================
+    // SIMPAN JAWABAN
+    // ================================
     foreach ($answers as $answer) {
         Answer::create([
             'question_id' => $question->id,
-            'answer_text' => $answer['answer_text'],
+            'answer_text' => $answer['answer_text'] ?? null,
+            'drag_source' => $answer['drag_source'] ?? null,
+            'drag_target' => $answer['drag_target'] ?? null,
             'is_correct' => $answer['is_correct'] ?? 0,
-            'explanation' => $answer['explanation'] ?? null,
         ]);
     }
 
+    // Redirect
     if ($material) {
         return redirect()
             ->route('admin.materials.questions.index', $material)
@@ -153,6 +169,7 @@ class QuestionController extends Controller
         ->route('admin.questions.index')
         ->with('success', 'Soal berhasil ditambahkan.');
 }
+
 
     public function edit(Material $material = null, Question $question)
     {
@@ -171,22 +188,22 @@ class QuestionController extends Controller
             'difficulty' => 'required|in:beginner,medium,hard',
             'material_id' => 'required|exists:materials,id',
         ];
-        
+
         // Validasi khusus untuk answers berdasarkan tipe soal
         if ($request->question_type === 'fill_in_the_blank') {
             $answersValidation = ['answers' => 'required|array|min:1'];
         } else {
             $answersValidation = ['answers' => 'required|array|min:2'];
         }
-        
+
         // Gabungkan validasi
         $validationRules = array_merge($baseValidation, $answersValidation);
-        
+
         // Tambahkan validasi untuk setiap jawaban
         $validationRules['answers.*.answer_text'] = 'required|string';
         $validationRules['answers.*.is_correct'] = 'required|boolean';
         $validationRules['answers.*.explanation'] = 'nullable|string|max:500';
-        
+
         $request->validate($validationRules);
 
         $questionType = $request->question_type;
@@ -225,7 +242,7 @@ class QuestionController extends Controller
         }
 
         $material = $question->material;
-        
+
         if ($material) {
             return redirect()
                 ->route('admin.materials.questions.index', $material)
@@ -254,4 +271,3 @@ class QuestionController extends Controller
             ->with('success', 'Soal berhasil dihapus.');
     }
 }
-    
