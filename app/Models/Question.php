@@ -10,14 +10,8 @@ class Question extends Model
     use HasFactory;
 
     const TYPE_FILL_IN_THE_BLANK = 'fill_in_the_blank';
-    
-    protected $fillable = [
-        'material_id',
-        'question_text',
-        'question_type',
-        'difficulty',
-        'created_by'
-    ];
+
+    protected $fillable = ['material_id', 'question_text', 'question_type', 'difficulty', 'created_by'];
 
     public function material()
     {
@@ -46,7 +40,19 @@ class Question extends Model
 
     public function questionBanks()
     {
-        return $this->belongsToMany(QuestionBank::class, 'question_bank_items')
-            ->withTimestamps();
+        return $this->belongsToMany(QuestionBank::class, 'question_bank_items')->withTimestamps();
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($question) {
+            if ($question->question_type === 'parsons_problem_2d') {
+                $question->difficulty = 'parsons';
+            }
+
+            if ($question->question_type === 'drag_and_drop' && $question->parsons_mode) {
+                $question->difficulty = 'parsons';
+            }
+        });
     }
 }

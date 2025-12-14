@@ -75,18 +75,21 @@ class QuestionController extends Controller
 
     public function store(Request $request, Material $material = null)
 {
-    // Validasi dasar
+    // ================================
+    // VALIDASI DASAR
+    // ================================
     $baseValidation = [
         'question_text' => 'required|string',
-        'question_type' => 'required|in:radio_button,drag_and_drop,fill_in_the_blank,parsons_problem_2d', // ← PERBAIKAN
-        'difficulty' => 'required|in:beginner,medium,hard',
+        'question_type' => 'required|in:radio_button,drag_and_drop,fill_in_the_blank,parsons_problem_2d',
         'material_id' => 'required|exists:materials,id',
+        'difficulty' => 'nullable|string', // Bisa manual atau auto
+        'parsons_mode' => 'nullable|boolean', // Untuk drag & drop versi Parsons
     ];
 
-    // Validasi khusus berdasarkan tipe soal
+    // Validasi berdasarkan tipe soal
     switch ($request->question_type) {
 
-        case 'parsons_problem_2d': // ← PERBAIKAN
+        case 'parsons_problem_2d':
             $answersValidation = [
                 'answers' => 'required|array|min:1',
                 'answers.*.drag_source' => 'required|string',
@@ -101,7 +104,7 @@ class QuestionController extends Controller
             ];
             break;
 
-        default: // radio_button, drag_and_drop
+        default: // radio_button & drag_and_drop
             $answersValidation = [
                 'answers' => 'required|array|min:2',
                 'answers.*.answer_text' => 'required|string',
@@ -111,15 +114,32 @@ class QuestionController extends Controller
 
     $request->validate(array_merge($baseValidation, $answersValidation));
 
-    $answers = $request->answers;
 
     // ================================
-    // KHUSUS RADIO & FILL IN THE BLANK
+    // AUTO DIFFICULTY
     // ================================
+    $autoDifficulty = $request->difficulty; // default manual
+
+    // Parsons 2D otomatis jadi parsons
+    if ($request->question_type === 'parsons_problem_2d') {
+        $autoDifficulty = 'parsons';
+    }
+
+    // Drag & Drop (parsons mode) → difficulty = parsons
+    if ($request->question_type === 'drag_and_drop' && $request->boolean('parsons_mode')) {
+        $autoDifficulty = 'parsons';
+    }
+
+
+    // ================================
+    // HANDLE RADIO & FILL BLANK
+    // ================================
+    $answers = $request->answers;
+
     if (in_array($request->question_type, ['radio_button', 'fill_in_the_blank'])) {
 
         if (!$request->has('correct_answer')) {
-            return redirect()->back()->withInput()->with('error', 'Please select the correct answer.');
+            return back()->withInput()->with('error', 'Please select the correct answer.');
         }
 
         $correctIndex = $request->correct_answer;
@@ -128,37 +148,42 @@ class QuestionController extends Controller
             $answer['is_correct'] = ($idx == $correctIndex) ? 1 : 0;
         }
 
-        // Pastikan hanya 1 jawaban benar
         if (collect($answers)->where('is_correct', 1)->count() !== 1) {
-            return redirect()->back()->withInput()->with('error', 'Must have exactly one correct answer.');
+            return back()->withInput()->with('error', 'Must have exactly one correct answer.');
         }
     }
+
 
     // ================================
     // SIMPAN SOAL
     // ================================
     $question = Question::create([
-        'question_text' => $request->question_text,
-        'question_type' => $request->question_type,
-        'difficulty' => $request->difficulty,
-        'material_id' => $request->material_id,
-        'created_by' => auth()->id(),
+        'question_text'  => $request->question_text,
+        'question_type'  => $request->question_type,
+        'difficulty'     => $autoDifficulty,
+        'parsons_mode'   => $request->boolean('parsons_mode'),  // ✔️ FIX FINAL
+        'material_id'    => $request->material_id,
+        'created_by'     => auth()->id(),
     ]);
+
 
     // ================================
     // SIMPAN JAWABAN
     // ================================
     foreach ($answers as $answer) {
         Answer::create([
-            'question_id' => $question->id,
-            'answer_text' => $answer['answer_text'] ?? null,
-            'drag_source' => $answer['drag_source'] ?? null,
-            'drag_target' => $answer['drag_target'] ?? null,
-            'is_correct' => $answer['is_correct'] ?? 0,
+            'question_id'  => $question->id,
+            'answer_text'  => $answer['answer_text'] ?? null,
+            'drag_source'  => $answer['drag_source'] ?? null,
+            'drag_target'  => $answer['drag_target'] ?? null,
+            'is_correct'   => $answer['is_correct'] ?? 0,
         ]);
     }
 
-    // Redirect
+
+    // ================================
+    // REDIRECT
+    // ================================
     if ($material) {
         return redirect()
             ->route('admin.materials.questions.index', $material)
@@ -169,6 +194,8 @@ class QuestionController extends Controller
         ->route('admin.questions.index')
         ->with('success', 'Soal berhasil ditambahkan.');
 }
+
+
 
 
     public function edit(Material $material = null, Question $question)
