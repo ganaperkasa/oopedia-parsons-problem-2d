@@ -329,6 +329,8 @@
 
     @push('scripts')
         <script>
+            const START_QUESTION_ID = {{ $startQuestion->id ?? 'null' }};
+    const START_QUESTION_TYPE = "{{ $startQuestion->question_type ?? '' }}";
             let currentQuestion = null;
             let currentQuestionType = null;
             let currentMaterialId = {{ $material->id }};
@@ -337,6 +339,7 @@
 
             // Load Question
             function loadQuestion(questionId, questionType) {
+                currentQuestion = { id: questionId };
                 console.log('Loading question:', questionId, 'Type:', questionType);
 
                 if (!currentMaterialId) {
@@ -526,32 +529,30 @@
                 this.classList.remove('dragging');
             }
 
-            // Setup Answer Area Drop Zone for Parsons
             document.addEventListener('DOMContentLoaded', function() {
-                const answerArea = document.getElementById('answer-area');
+    const answerArea = document.getElementById('answer-area');
 
-                answerArea.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = 'move';
-                });
+    answerArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    });
 
-                answerArea.addEventListener('drop', function(e) {
-                    e.preventDefault();
+    answerArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        if (!draggedElement) return;
 
-                    if (!draggedElement) return;
+        const placeholder = answerArea.querySelector('.text-muted');
+        if (placeholder) placeholder.remove();
 
-                    const placeholder = answerArea.querySelector('.text-muted');
-                    if (placeholder) placeholder.remove();
+        answerArea.appendChild(draggedElement);
+    });
 
-                    answerArea.appendChild(draggedElement);
-                });
+    // 🔥 LOAD SOAL AWAL DARI BACKEND
+    if (START_QUESTION_ID && START_QUESTION_TYPE) {
+        loadQuestion(START_QUESTION_ID, START_QUESTION_TYPE);
+    }
+});
 
-                // Load first question
-                const firstQuestion = document.querySelector('.question-box');
-                if (firstQuestion) {
-                    loadQuestion(firstQuestion.dataset.questionId, firstQuestion.dataset.questionType);
-                }
-            });
 
             // Reset Answer
             function resetAnswer() {
@@ -670,13 +671,18 @@
                                 }
 
                                 setTimeout(() => {
-                                    const nextQuestionBox = questionBox.closest('.col-auto').nextElementSibling
-                                        ?.querySelector('.question-box');
-                                    if (nextQuestionBox && !nextQuestionBox.classList.contains('answered')) {
-                                        loadQuestion(nextQuestionBox.dataset.questionId, nextQuestionBox.dataset
-                                            .questionType);
-                                    }
-                                }, 2000);
+    const allBoxes = document.querySelectorAll('.question-box');
+    const nextUnanswered = Array.from(allBoxes)
+        .find(box => !box.classList.contains('answered'));
+
+    if (nextUnanswered) {
+        loadQuestion(
+            nextUnanswered.dataset.questionId,
+            nextUnanswered.dataset.questionType
+        );
+    }
+}, 2000);
+
                             } else {
                                 feedbackArea.innerHTML = `
                     <div class="alert alert-danger">
