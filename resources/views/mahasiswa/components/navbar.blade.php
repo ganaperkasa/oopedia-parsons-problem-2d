@@ -8,12 +8,12 @@
             padding-left: 8px;
             padding-right: 8px;
         }
-        
+
         /* Profile dropdown style untuk mobile */
         .profile-dropdown {
             position: static;  /* Penting: membuat dropdown muncul relatif terhadap navbar */
         }
-        
+
         .profile-dropdown .dropdown-menu {
             position: absolute;
             right: 10px;
@@ -23,44 +23,44 @@
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        
+
         /* Animasi dropdown yang lebih halus */
         .dropdown-menu.show {
             transform: translateY(0);
             opacity: 1;
             transition: transform 0.2s ease, opacity 0.2s ease;
         }
-        
+
         .dropdown-menu {
             transform: translateY(-10px);
             opacity: 0;
         }
     }
-    
+
     /* Perbaikan umum */
     .navbar {
         position: sticky;
         top: 0;
         z-index: 1030;
     }
-    
+
     .dropdown-item {
         display: flex;
         align-items: center;
         padding: 8px 16px;
     }
-    
+
     .profile-image {
         border-radius: 50%;
         object-fit: cover;
     }
-    
+
     .mobile-header-links {
         background-color: #f8f9fa;
         border-bottom: 1px solid #eee;
         margin-bottom: 0.5rem;
     }
-    
+
     .mobile-header-links .btn-icon {
         width: 40px;
         height: 40px;
@@ -72,23 +72,23 @@
         color: #333;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
-    
+
     .mobile-header-links .btn-icon.active {
         background: #007bff;
         color: white;
     }
-    
+
     @media (max-width: 359.98px) {
         .profile-image {
             width: 25px;
             height: 25px;
         }
-        
+
         .navbar .container-fluid {
             padding-left: 4px;
             padding-right: 4px;
         }
-        
+
         .btn-icon {
             padding: 0.25rem;
             font-size: 0.875rem;
@@ -106,16 +106,16 @@
             <button id="sidebarToggleBtn" class="btn btn-icon d-lg-none me-2">
                 <i class="fas fa-bars"></i>
             </button>
-            
+
             <!-- Navigation links -->
             <div class="nav-links">
                 <ul class="nav-menu">
                     @auth
                     <li>
-                        <a href="{{ route('mahasiswa.dashboard') }}" 
+                        <a href="{{ route('mahasiswa.dashboard') }}"
                            class="nav-link {{ request()->routeIs('mahasiswa.dashboard*') ? 'active' : '' }}"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="bottom" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="bottom"
                            title="Dashboard pengguna">
                             <i class="fas fa-home me-2"></i>
                             <span>Dashboard</span>
@@ -123,10 +123,10 @@
                     </li>
                     @endauth
                     <li>
-                        <a href="{{ route('mahasiswa.materials.index') }}" 
+                        <a href="{{ route('mahasiswa.materials.index') }}"
                            class="nav-link {{ request()->routeIs('mahasiswa.materials*') && !request()->routeIs('mahasiswa.materials.questions*') ? 'active' : '' }}"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="bottom" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="bottom"
                            title="@auth Kumpulan materi pembelajaran @else Kumpulan materi pembelajaran @endauth">
                             <i class="fas fa-book me-2"></i>
                             <span>Materi</span>
@@ -136,10 +136,10 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('mahasiswa.materials.questions.index') }}" 
+                        <a href="{{ route('mahasiswa.materials.questions.index') }}"
                            class="nav-link {{ request()->routeIs('mahasiswa.materials.questions*') ? 'active' : '' }}"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="bottom" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="bottom"
                            title="@auth Latihan soal untuk menguji pemahaman pengguna @else Latihan soal untuk menguji pemahaman @endauth">
                             <i class="fas fa-clipboard-check me-2"></i>
                             <span>Latihan Soal</span>
@@ -149,10 +149,10 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('mahasiswa.leaderboard') }}" 
+                        <a href="{{ route('mahasiswa.leaderboard') }}"
                            class="nav-link {{ request()->routeIs('mahasiswa.leaderboard*') ? 'active' : '' }}"
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="bottom" 
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="bottom"
                            title="Papan peringkat pengguna berdasarkan skor">
                             <i class="fas fa-trophy me-2"></i>
                             <span>Peringkat</span>
@@ -169,15 +169,15 @@
         <div class="d-flex align-items-center">
             @guest
                 <div class="auth-buttons me-3 d-none d-md-flex">
-                    <a href="{{ route('login') }}" class="btn btn-primary btn-sm me-2" 
-                       data-bs-toggle="tooltip" 
-                       data-bs-placement="bottom" 
+                    <a href="{{ route('login') }}" class="btn btn-primary btn-sm me-2"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="bottom"
                        title="Login untuk akses semua soal latihan tanpa batasan">
-                        <i class="fas fa-sign-in-alt me-1"></i> Login
+                        <i class="fas fa-sign-in-alt me-1"></i> Loginn
                     </a>
                     <a href="{{ route('register') }}" class="btn btn-primary btn-sm"
-                       data-bs-toggle="tooltip" 
-                       data-bs-placement="bottom" 
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="bottom"
                        title="Buat akun baru untuk akses semua soal latihan tanpa batasan">
                         <i class="fas fa-user-plus me-1"></i> Register
                     </a>
@@ -189,7 +189,7 @@
                     </a>
                 </div>
             @endguest
-            
+
             @auth
             <div class="dropdown profile-dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -250,18 +250,18 @@
         const isMainTutorialCompleted = sessionStorage.getItem('main_tutorial_complete');
         const isDashboardPage = {{ request()->routeIs('mahasiswa.dashboard*') ? 'true' : 'false' }};
         const isQuestionsPage = {{ request()->routeIs('mahasiswa.materials.questions*') ? 'true' : 'false' }};
-        
+
         // Skip tutorial for guests and on question pages
         if (isLoggedIn && !isMainTutorialCompleted && isDashboardPage && !sidebarClicked && !sessionStorage.getItem('skip_tour')) {
             startTutorial();
         }
-        
+
         // SOLUSI BARU: Pendekatan langsung untuk toggle sidebar
         // Dapatkan elemen-elemen yang diperlukan
         const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
         const sidebar = document.querySelector('.sidebar');
         let sidebarBackdrop = document.querySelector('.sidebar-backdrop');
-        
+
         // Periksa apakah backdrop sudah ada
         if (!sidebarBackdrop) {
             // Jika belum ada, buat elemen backdrop baru
@@ -269,36 +269,36 @@
             sidebarBackdrop.className = 'sidebar-backdrop';
             document.body.appendChild(sidebarBackdrop);
         }
-        
+
         // Fungsi sederhana untuk toggle sidebar
         function toggleSidebar() {
             console.log('Toggle sidebar dipanggil'); // Logging untuk debugging
             sidebar.classList.toggle('show');
             sidebarBackdrop.classList.toggle('show');
         }
-        
+
         // PENTING: Pasang event listener langsung dengan implementasi paling sederhana
         sidebarToggleBtn.addEventListener('click', function(e) {
             e.preventDefault();
             console.log('Tombol sidebar diklik'); // Logging untuk debugging
             toggleSidebar();
         });
-        
+
         // Event listener untuk backdrop (untuk menutup sidebar saat klik di luar)
         sidebarBackdrop.addEventListener('click', function() {
             if (sidebar.classList.contains('show')) {
                 toggleSidebar();
             }
         });
-        
+
         // Event listener untuk tombol Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && sidebar.classList.contains('show')) {
                 toggleSidebar();
             }
         });
-        
-        // Tambahkan event listener untuk semua link di sidebar 
+
+        // Tambahkan event listener untuk semua link di sidebar
         // agar sidebar tertutup saat link diklik (pada tampilan mobile)
         document.querySelectorAll('.sidebar a').forEach(link => {
             link.addEventListener('click', function() {
@@ -307,7 +307,7 @@
                 }
             });
         });
-        
+
         // Juga tambahkan event listener untuk tombol tutup di sidebar
         const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
         if (sidebarCloseBtn) {
@@ -347,7 +347,7 @@
                 intro: "Ini adalah dashboard. Kamu bisa melihat ringkasan aktivitas di sini."
             });
         }
-        
+
         // These steps are always shown
         steps.push(
             {
@@ -387,15 +387,15 @@
         link.addEventListener('click', function(event) {
             // Tandai bahwa ini klik dari sidebar
             sidebarClicked = true;
-            
+
             // Untuk materi, biarkan lanjut tanpa tour
             sessionStorage.setItem('skip_tour', 'true');
-            
+
             // Tutup sidebar otomatis di mobile setelah link diklik
             if (window.innerWidth <= 991.98) {
                 const sidebar = document.querySelector('.sidebar');
                 const sidebarBackdrop = document.querySelector('.sidebar-backdrop');
-                
+
                 if (sidebar && sidebar.classList.contains('show')) {
                     sidebar.classList.remove('show');
                     if (sidebarBackdrop) {
