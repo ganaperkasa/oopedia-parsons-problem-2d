@@ -200,7 +200,7 @@
 
             @foreach ($sidebarMaterials as $materialItem)
                 <li>
-                    <a href="{{ route('mahasiswa.materials.questions.levels', ['material' => $materialItem->id, 'difficulty' => 'beginner']) }}"
+                    <a href="{{ route('mahasiswa.materials.questions.parsons-problem.levels', ['material' => $materialItem->id, 'difficulty' => 'parsons']) }}"
                         class="menu-item {{ request()->segment(3) == $materialItem->id ? 'active' : '' }}"
                         data-bs-toggle="tooltip" data-bs-placement="right"
                         title="Latihan soal untuk materi {{ $materialItem->title }}">
@@ -211,7 +211,7 @@
                     {{-- Tampilkan sub-menu tingkat kesulitan jika material ini aktif --}}
                     @if (request()->segment(3) == $materialItem->id)
                         <div class="submenu">
-                            <a href="{{ route('mahasiswa.materials.questions.levels', ['material' => $materialItem->id, 'difficulty' => 'beginner']) }}"
+                            {{-- <a href="{{ route('mahasiswa.materials.questions.levels', ['material' => $materialItem->id, 'difficulty' => 'beginner']) }}"
                                 class="menu-item sub-menu-item {{ request()->query('difficulty') == 'beginner' ? 'active' : '' }}"
                                 data-bs-toggle="tooltip" data-bs-placement="right" title="Soal tingkat pemula">
                                 <i class="fas fa-star beginner-star"></i>
@@ -230,7 +230,7 @@
                                 data-bs-toggle="tooltip" data-bs-placement="right" title="Soal tingkat sulit">
                                 <i class="fas fa-star hard-star"></i>
                                 <span>Hard</span>
-                            </a>
+                            </a> --}}
                             <a href="{{ route('mahasiswa.materials.questions.parsons-problem.levels', ['material' => $materialItem->id, 'difficulty' => 'parsons']) }}"
                                 class="menu-item sub-menu-item {{ request()->query('difficulty') == 'parsons' ? 'active' : '' }}"
                                 data-bs-toggle="tooltip" data-bs-placement="right" title="Soal Latihan Parsons Problem 2D">
