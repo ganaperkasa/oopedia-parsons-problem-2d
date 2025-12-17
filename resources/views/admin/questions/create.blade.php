@@ -195,90 +195,92 @@
             let answerCount = 1;
 
             function handleQuestionTypeChange() {
-                const questionType = document.querySelector('[name="question_type"]').value;
+    const questionType = document.querySelector('[name="question_type"]').value;
 
-                const normalContainer = document.getElementById('answers-container');
-                const parsonsContainer = document.getElementById('answers-parsons');
+    const normalContainer = document.getElementById('answers-container');
+    const parsonsContainer = document.getElementById('answers-parsons');
 
-                const normalAddBtn = document.getElementById('add-answer-btn');
-                const parsonsAddBtn = document.getElementById('add-parsons-btn');
+    const normalAddBtn = document.getElementById('add-answer-btn');
+    const parsonsAddBtn = document.getElementById('add-parsons-btn');
 
-                const parsonsModeWrapper = document.getElementById('parsons-mode-wrapper');
-                const parsonsModeCheck = document.getElementById('parsonsModeCheck');
+    const parsonsModeWrapper = document.getElementById('parsons-mode-wrapper');
+    const parsonsModeCheck = document.getElementById('parsonsModeCheck');
 
-                // ================= RESET =================
-                normalContainer.style.display = 'none';
-                parsonsContainer.style.display = 'none';
-                normalAddBtn.style.display = 'none';
-                parsonsAddBtn.style.display = 'none';
+    // ================= RESET =================
+    normalContainer.style.display = 'none';
+    parsonsContainer.style.display = 'none';
+    normalAddBtn.style.display = 'none';
+    parsonsAddBtn.style.display = 'none';
 
-                // 🔥 PENTING: aktifkan ulang input normal (default)
-                document.querySelectorAll('#answers-container input').forEach(input => {
-                    input.disabled = false;
-                    input.required = true;
-                });
+    // Aktifkan ulang input normal (default)
+    document.querySelectorAll('#answers-container input').forEach(input => {
+        input.disabled = false;
+        input.required = true;
+    });
 
-                // ================= PARSONS 2D =================
-                if (questionType === 'parsons_problem_2d') {
+    // ================= PARSONS 2D =================
+    if (questionType === 'parsons_problem_2d') {
 
-                    parsonsModeWrapper.style.display = 'block';
-                    parsonsModeCheck.checked = true;
-                    parsonsModeCheck.disabled = true;
+        parsonsModeWrapper.style.display = 'block';
+        parsonsModeCheck.checked = true;
+        parsonsModeCheck.disabled = true;
 
-                    // 🔥 FIX UTAMA: NONAKTIFKAN INPUT NORMAL
-                    document.querySelectorAll('#answers-container input').forEach(input => {
-                        input.disabled = true;
-                        input.required = false;
-                    });
+        // Nonaktifkan input normal
+        document.querySelectorAll('#answers-container input').forEach(input => {
+            input.disabled = true;
+            input.required = false;
+        });
 
-                    parsonsContainer.style.display = 'block';
-                    parsonsAddBtn.style.display = 'block';
+        parsonsContainer.style.display = 'block';
+        parsonsAddBtn.style.display = 'block';
 
-                    parsonsContainer.innerHTML = `<h6 class="mb-3">Potongan Kode (Parsons 2D)</h6>`;
-                    addParsonsAnswer();
-                    return;
-                }
+        parsonsContainer.innerHTML = `<h6 class="mb-3">Potongan Kode (Parsons 2D)</h6>`;
+        addParsonsAnswer();
+        return;
+    }
 
-                // ================= DRAG & DROP =================
-                if (questionType === 'drag_and_drop') {
+    // ================= DRAG & DROP =================
+    if (questionType === 'drag_and_drop') {
 
-                    parsonsModeWrapper.style.display = 'block';
-                    parsonsModeCheck.disabled = false;
+        parsonsModeWrapper.style.display = 'block';
+        parsonsModeCheck.disabled = false;
+        // 🔥 Jangan auto-check, biarkan user yang pilih
+        // parsonsModeCheck.checked = false;
 
-                    normalContainer.style.display = 'block';
-                    normalAddBtn.style.display = 'block';
+        normalContainer.style.display = 'block';
+        normalAddBtn.style.display = 'block';
 
-                    normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
-                    addAnswer();
-                    addAnswer();
-                    return;
-                }
+        normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
+        addAnswer();
+        addAnswer();
+        return;
+    }
 
-                // ================= FILL IN THE BLANK =================
-                if (questionType === 'fill_in_the_blank') {
+    // ================= FILL IN THE BLANK =================
+    if (questionType === 'fill_in_the_blank') {
 
-                    parsonsModeWrapper.style.display = 'none';
+        parsonsModeWrapper.style.display = 'none';
 
-                    normalContainer.style.display = 'block';
-                    normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
-                    addAnswer();
-                    return;
-                }
+        normalContainer.style.display = 'block';
+        normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
+        addAnswer();
+        return;
+    }
 
-                // ================= RADIO BUTTON =================
-                if (questionType === 'radio_button') {
+    // ================= RADIO BUTTON =================
+    if (questionType === 'radio_button') {
 
-                    parsonsModeWrapper.style.display = 'none';
+        parsonsModeWrapper.style.display = 'none';
 
-                    normalContainer.style.display = 'block';
-                    normalAddBtn.style.display = 'block';
+        normalContainer.style.display = 'block';
+        normalAddBtn.style.display = 'block';
 
-                    normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
-                    addAnswer();
-                    addAnswer();
-                    return;
-                }
-            }
+        normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
+        addAnswer();
+        addAnswer();
+        return;
+    }
+}
 
 
             function addParsonsAnswer() {
@@ -304,13 +306,13 @@
             }
 
             function addAnswer() {
-                const type = document.querySelector('[name="question_type"]').value;
-                if (type === 'parsons_problem_2d') return;
+    const type = document.querySelector('[name="question_type"]').value;
+    if (type === 'parsons_problem_2d') return;
 
-                const container = document.getElementById('answers-container');
-                const index = container.getElementsByClassName('answer-entry').length;
+    const container = document.getElementById('answers-container');
+    const index = container.getElementsByClassName('answer-entry').length;
 
-                const html = `
+    const html = `
         <div class="answer-entry mb-3">
             <div class="row">
                 <div class="col-md-8">
@@ -318,17 +320,16 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="correct_answer" value="${index}">
+                        <input class="form-check-input" type="radio" name="correct_answer" value="${index}" required>
                         <label class="form-check-label">Jawaban Benar</label>
-                        <input type="hidden" name="answers[${index}][is_correct]" value="0">
                     </div>
                 </div>
             </div>
         </div>
     `;
 
-                container.insertAdjacentHTML('beforeend', html);
-            }
+    container.insertAdjacentHTML('beforeend', html);
+}
 
 
             document.addEventListener('DOMContentLoaded', function() {
