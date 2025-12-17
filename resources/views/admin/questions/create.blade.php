@@ -84,14 +84,16 @@
                             </div>
 
                             <div class="mb-3" id="parsons-mode-wrapper" style="display:none;">
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="parsons_mode" value="1" id="parsonsModeCheck">
-        <label class="form-check-label" for="parsonsModeCheck">
-            Parsons Mode (Drag jawaban saja)
-        </label>
-    </div>
-    <small class="text-muted">Centang ini jika drag and drop termasuk Parsons Problem.</small>
-</div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="parsons_mode" value="1"
+                                        id="parsonsModeCheck">
+                                    <label class="form-check-label" for="parsonsModeCheck">
+                                        Parsons Mode (Drag jawaban saja)
+                                    </label>
+                                </div>
+                                <small class="text-muted">Centang ini jika drag and drop termasuk Parsons
+                                    Problem.</small>
+                            </div>
 
 
 
@@ -110,7 +112,7 @@
                             <div id="answers-container">
                                 <h6 class="mb-3">Jawaban</h6>
 
-                                <div class="answer-entry mb-3">
+                                {{-- <div class="answer-entry mb-3">
                                     <div class="row">
                                         <div class="col-md-8">
                                             <input type="text" name="answers[0][answer_text]" class="form-control"
@@ -125,7 +127,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
 
 
@@ -189,96 +191,101 @@
     </main>
 
     @push('js')
-       <script>
-let answerCount = 1;
+        <script>
+            let answerCount = 1;
 
-function handleQuestionTypeChange() {
-    const questionType = document.querySelector('[name="question_type"]').value;
+            function handleQuestionTypeChange() {
+                const questionType = document.querySelector('[name="question_type"]').value;
 
-    const normalContainer = document.getElementById('answers-container');
-    const parsonsContainer = document.getElementById('answers-parsons');
+                const normalContainer = document.getElementById('answers-container');
+                const parsonsContainer = document.getElementById('answers-parsons');
 
-    const normalAddBtn = document.getElementById('add-answer-btn');
-    const parsonsAddBtn = document.getElementById('add-parsons-btn');
+                const normalAddBtn = document.getElementById('add-answer-btn');
+                const parsonsAddBtn = document.getElementById('add-parsons-btn');
 
-    const parsonsModeWrapper = document.getElementById('parsons-mode-wrapper');
-    const parsonsModeCheck = document.getElementById('parsonsModeCheck');
+                const parsonsModeWrapper = document.getElementById('parsons-mode-wrapper');
+                const parsonsModeCheck = document.getElementById('parsonsModeCheck');
 
-    // Reset fields first
-    normalContainer.style.display = 'none';
-    parsonsContainer.style.display = 'none';
-    normalAddBtn.style.display = 'none';
-    parsonsAddBtn.style.display = 'none';
+                // ================= RESET =================
+                normalContainer.style.display = 'none';
+                parsonsContainer.style.display = 'none';
+                normalAddBtn.style.display = 'none';
+                parsonsAddBtn.style.display = 'none';
 
-    // ========== DRAG AND DROP ==========
-    if (questionType === 'drag_and_drop') {
-        // Parsons Mode OPTIONAL
-        parsonsModeWrapper.style.display = 'block';
+                // 🔥 PENTING: aktifkan ulang input normal (default)
+                document.querySelectorAll('#answers-container input').forEach(input => {
+                    input.disabled = false;
+                    input.required = true;
+                });
 
-        // ✅ PERBAIKAN: Jangan reset checkbox, biarkan user yang pilih
-        // Hanya set default jika belum pernah di-initialize
-        if (parsonsModeCheck.dataset.initialized !== 'true') {
-            parsonsModeCheck.checked = false;
-            parsonsModeCheck.dataset.initialized = 'true';
-        }
+                // ================= PARSONS 2D =================
+                if (questionType === 'parsons_problem_2d') {
 
-        // Show normal answer form
-        normalContainer.style.display = 'block';
-        normalAddBtn.style.display = 'block';
-        normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
-        addAnswer();
-        addAnswer();
-        return;
-    }
+                    parsonsModeWrapper.style.display = 'block';
+                    parsonsModeCheck.checked = true;
+                    parsonsModeCheck.disabled = true;
 
-    // ========== PARSONS PROBLEM 2D ==========
-    if (questionType === 'parsons_problem_2d') {
-        // Parsons Mode ALWAYS ON
-        parsonsModeWrapper.style.display = 'block';
-        parsonsModeCheck.checked = true;
-        parsonsModeCheck.disabled = true; // ✅ Disable agar tidak bisa diubah
+                    // 🔥 FIX UTAMA: NONAKTIFKAN INPUT NORMAL
+                    document.querySelectorAll('#answers-container input').forEach(input => {
+                        input.disabled = true;
+                        input.required = false;
+                    });
 
-        // Show Parsons inputs
-        parsonsContainer.style.display = 'block';
-        parsonsAddBtn.style.display = 'block';
+                    parsonsContainer.style.display = 'block';
+                    parsonsAddBtn.style.display = 'block';
 
-        parsonsContainer.innerHTML = `
-            <h6 class="mb-3">Potongan Kode (Parsons 2D)</h6>
-        `;
-        addParsonsAnswer();
-        return;
-    }
+                    parsonsContainer.innerHTML = `<h6 class="mb-3">Potongan Kode (Parsons 2D)</h6>`;
+                    addParsonsAnswer();
+                    return;
+                }
 
-    // ========== FILL IN THE BLANK ==========
-    if (questionType === 'fill_in_the_blank') {
-        parsonsModeWrapper.style.display = 'none';
-        parsonsModeCheck.disabled = false;
+                // ================= DRAG & DROP =================
+                if (questionType === 'drag_and_drop') {
 
-        normalContainer.style.display = 'block';
-        normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
-        addAnswer(); // satu saja
-        return;
-    }
+                    parsonsModeWrapper.style.display = 'block';
+                    parsonsModeCheck.disabled = false;
 
-    // ========== RADIO BUTTON ==========
-    if (questionType === 'radio_button') {
-        parsonsModeWrapper.style.display = 'none';
-        parsonsModeCheck.disabled = false;
+                    normalContainer.style.display = 'block';
+                    normalAddBtn.style.display = 'block';
 
-        normalContainer.style.display = 'block';
-        normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
-        addAnswer();
-        addAnswer();
-        normalAddBtn.style.display = 'block';
-        return;
-    }
-}
+                    normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
+                    addAnswer();
+                    addAnswer();
+                    return;
+                }
 
-function addParsonsAnswer() {
-    const container = document.getElementById('answers-parsons');
-    const index = container.getElementsByClassName('parsons-entry').length;
+                // ================= FILL IN THE BLANK =================
+                if (questionType === 'fill_in_the_blank') {
 
-    const html = `
+                    parsonsModeWrapper.style.display = 'none';
+
+                    normalContainer.style.display = 'block';
+                    normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
+                    addAnswer();
+                    return;
+                }
+
+                // ================= RADIO BUTTON =================
+                if (questionType === 'radio_button') {
+
+                    parsonsModeWrapper.style.display = 'none';
+
+                    normalContainer.style.display = 'block';
+                    normalAddBtn.style.display = 'block';
+
+                    normalContainer.innerHTML = `<h6 class="mb-3">Jawaban</h6>`;
+                    addAnswer();
+                    addAnswer();
+                    return;
+                }
+            }
+
+
+            function addParsonsAnswer() {
+                const container = document.getElementById('answers-parsons');
+                const index = container.getElementsByClassName('parsons-entry').length;
+
+                const html = `
         <div class="parsons-entry mb-3">
             <div class="row">
                 <div class="col-md-6">
@@ -293,17 +300,17 @@ function addParsonsAnswer() {
         </div>
     `;
 
-    container.insertAdjacentHTML('beforeend', html);
-}
+                container.insertAdjacentHTML('beforeend', html);
+            }
 
-function addAnswer() {
-    const type = document.querySelector('[name="question_type"]').value;
-    if (type === 'parsons_problem_2d') return;
+            function addAnswer() {
+                const type = document.querySelector('[name="question_type"]').value;
+                if (type === 'parsons_problem_2d') return;
 
-    const container = document.getElementById('answers-container');
-    const index = container.getElementsByClassName('answer-entry').length;
+                const container = document.getElementById('answers-container');
+                const index = container.getElementsByClassName('answer-entry').length;
 
-    const html = `
+                const html = `
         <div class="answer-entry mb-3">
             <div class="row">
                 <div class="col-md-8">
@@ -320,93 +327,92 @@ function addAnswer() {
         </div>
     `;
 
-    container.insertAdjacentHTML('beforeend', html);
-}
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ Script loaded!');
-
-    // Cek apakah form ada
-    const form = document.querySelector('form');
-    if (!form) {
-        console.error('❌ FORM TIDAK DITEMUKAN!');
-        return;
-    }
-    console.log('✅ Form ditemukan:', form);
-
-    // Cek apakah checkbox ada
-    const checkbox = document.getElementById('parsonsModeCheck');
-    if (!checkbox) {
-        console.error('❌ CHECKBOX parsonsModeCheck TIDAK DITEMUKAN!');
-    } else {
-        console.log('✅ Checkbox ditemukan:', checkbox);
-    }
-
-    // Setup question type change
-    const questionTypeSelect = document.querySelector('[name="question_type"]');
-    if (questionTypeSelect) {
-        questionTypeSelect.addEventListener('change', handleQuestionTypeChange);
-        handleQuestionTypeChange();
-        console.log('✅ Question type handler terpasang');
-    }
-
-    // Setup form submit listener
-    form.addEventListener('submit', function(e) {
-        console.log('🚀 FORM SEDANG DI-SUBMIT!');
-
-        const checkbox = document.getElementById('parsonsModeCheck');
-
-        if (!checkbox) {
-            console.error('❌ Checkbox tidak ditemukan saat submit!');
-            return;
-        }
-
-        console.log('=== FORM SUBMIT DEBUG ===');
-        console.log('Checkbox checked:', checkbox.checked);
-        console.log('Checkbox value:', checkbox.value);
-        console.log('Checkbox disabled:', checkbox.disabled);
-        console.log('Checkbox name:', checkbox.name);
-        console.log('Checkbox type:', checkbox.type);
-        console.log('Checkbox akan dikirim:', checkbox.checked && !checkbox.disabled ? 'YES (value=1)' : 'NO');
-
-        // Tampilkan semua data form
-        const formData = new FormData(e.target);
-        console.log('FormData entries:');
-        let hasParsonsMode = false;
-        for (let [key, value] of formData.entries()) {
-            console.log(`  ${key}: ${value}`);
-            if (key === 'parsons_mode') {
-                hasParsonsMode = true;
+                container.insertAdjacentHTML('beforeend', html);
             }
-        }
-
-        // Warning jika checkbox checked tapi tidak masuk FormData
-        if (checkbox.checked && !hasParsonsMode) {
-            console.error('⚠️⚠️⚠️ WARNING: Checkbox CHECKED tapi TIDAK masuk FormData!');
-            console.error('Penyebab:');
-            if (checkbox.disabled) {
-                console.error('  - Checkbox DISABLED (disabled checkbox tidak dikirim)');
-            }
-            if (!checkbox.name) {
-                console.error('  - Checkbox tidak punya NAME attribute');
-            }
-            if (!form.contains(checkbox)) {
-                console.error('  - Checkbox berada DI LUAR form');
-            }
-        } else if (checkbox.checked && hasParsonsMode) {
-            console.log('✅ Checkbox berhasil masuk FormData!');
-        }
-
-        // Jangan prevent default, biar form tetap submit
-        // e.preventDefault(); // JANGAN aktifkan ini
-    });
-
-    console.log('✅ Form submit listener terpasang');
-});
-</script>
 
 
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('✅ Script loaded!');
+
+                // Cek apakah form ada
+                const form = document.querySelector('form');
+                if (!form) {
+                    console.error('❌ FORM TIDAK DITEMUKAN!');
+                    return;
+                }
+                console.log('✅ Form ditemukan:', form);
+
+                // Cek apakah checkbox ada
+                const checkbox = document.getElementById('parsonsModeCheck');
+                if (!checkbox) {
+                    console.error('❌ CHECKBOX parsonsModeCheck TIDAK DITEMUKAN!');
+                } else {
+                    console.log('✅ Checkbox ditemukan:', checkbox);
+                }
+
+                // Setup question type change
+                const questionTypeSelect = document.querySelector('[name="question_type"]');
+                if (questionTypeSelect) {
+                    questionTypeSelect.addEventListener('change', handleQuestionTypeChange);
+                    handleQuestionTypeChange();
+                    console.log('✅ Question type handler terpasang');
+                }
+
+                // Setup form submit listener
+                form.addEventListener('submit', function(e) {
+                    console.log('🚀 FORM SEDANG DI-SUBMIT!');
+
+                    const checkbox = document.getElementById('parsonsModeCheck');
+
+                    if (!checkbox) {
+                        console.error('❌ Checkbox tidak ditemukan saat submit!');
+                        return;
+                    }
+
+                    console.log('=== FORM SUBMIT DEBUG ===');
+                    console.log('Checkbox checked:', checkbox.checked);
+                    console.log('Checkbox value:', checkbox.value);
+                    console.log('Checkbox disabled:', checkbox.disabled);
+                    console.log('Checkbox name:', checkbox.name);
+                    console.log('Checkbox type:', checkbox.type);
+                    console.log('Checkbox akan dikirim:', checkbox.checked && !checkbox.disabled ?
+                        'YES (value=1)' : 'NO');
+
+                    // Tampilkan semua data form
+                    const formData = new FormData(e.target);
+                    console.log('FormData entries:');
+                    let hasParsonsMode = false;
+                    for (let [key, value] of formData.entries()) {
+                        console.log(`  ${key}: ${value}`);
+                        if (key === 'parsons_mode') {
+                            hasParsonsMode = true;
+                        }
+                    }
+
+                    // Warning jika checkbox checked tapi tidak masuk FormData
+                    if (checkbox.checked && !hasParsonsMode) {
+                        console.error('⚠️⚠️⚠️ WARNING: Checkbox CHECKED tapi TIDAK masuk FormData!');
+                        console.error('Penyebab:');
+                        if (checkbox.disabled) {
+                            console.error('  - Checkbox DISABLED (disabled checkbox tidak dikirim)');
+                        }
+                        if (!checkbox.name) {
+                            console.error('  - Checkbox tidak punya NAME attribute');
+                        }
+                        if (!form.contains(checkbox)) {
+                            console.error('  - Checkbox berada DI LUAR form');
+                        }
+                    } else if (checkbox.checked && hasParsonsMode) {
+                        console.log('✅ Checkbox berhasil masuk FormData!');
+                    }
+
+                    // Jangan prevent default, biar form tetap submit
+                    // e.preventDefault(); // JANGAN aktifkan ini
+                });
+
+                console.log('✅ Form submit listener terpasang');
+            });
+        </script>
     @endpush
     <x-admin.tutorial />
 </x-layout>
