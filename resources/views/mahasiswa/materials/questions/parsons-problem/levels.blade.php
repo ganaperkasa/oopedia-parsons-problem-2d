@@ -664,24 +664,48 @@
                     </div>
                 `;
 
+                                // 🔥 UPDATE UI LANGSUNG TANPA REFRESH
                                 const questionBox = document.querySelector(`[data-question-id="${currentQuestion.id}"]`);
                                 if (questionBox) {
+                                    // Hapus class unanswered dan tambah answered
                                     questionBox.classList.remove('unanswered');
-                                    questionBox.classList.add('answered');
+                                    questionBox.classList.add('answered', 'disabled');
+
+                                    // Tambahkan centang icon jika belum ada
+                                    if (!questionBox.querySelector('.check-icon')) {
+                                        const checkIcon = document.createElement('span');
+                                        checkIcon.className = 'check-icon';
+                                        checkIcon.textContent = '✓';
+                                        questionBox.appendChild(checkIcon);
+                                    }
+
+                                    // Hapus event onclick agar tidak bisa diklik lagi
+                                    questionBox.removeAttribute('onclick');
+                                    questionBox.style.pointerEvents = 'none';
                                 }
 
+                                // Pindah ke soal berikutnya setelah 2 detik
                                 setTimeout(() => {
-    const allBoxes = document.querySelectorAll('.question-box');
-    const nextUnanswered = Array.from(allBoxes)
-        .find(box => !box.classList.contains('answered'));
+                                    const allBoxes = document.querySelectorAll('.question-box');
+                                    const nextUnanswered = Array.from(allBoxes)
+                                        .find(box => !box.classList.contains('answered'));
 
-    if (nextUnanswered) {
-        loadQuestion(
-            nextUnanswered.dataset.questionId,
-            nextUnanswered.dataset.questionType
-        );
-    }
-}, 2000);
+                                    if (nextUnanswered) {
+                                        loadQuestion(
+                                            nextUnanswered.dataset.questionId,
+                                            nextUnanswered.dataset.questionType
+                                        );
+                                    } else {
+                                        // Semua soal sudah dijawab
+                                        feedbackArea.innerHTML = `
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-trophy me-2"></i>
+                                                <strong>Selamat!</strong>
+                                                <p class="mb-0 mt-2">Anda telah menyelesaikan semua soal!</p>
+                                            </div>
+                                        `;
+                                    }
+                                }, 2000);
 
                             } else {
                                 feedbackArea.innerHTML = `
