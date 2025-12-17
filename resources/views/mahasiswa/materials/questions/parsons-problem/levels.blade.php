@@ -361,8 +361,6 @@
 
     @push('scripts')
         <script>
-            const START_QUESTION_ID = {{ $startQuestion->id ?? 'null' }};
-            const START_QUESTION_TYPE = "{{ $startQuestion->question_type ?? '' }}";
             let currentQuestion = null;
             let currentQuestionType = null;
             let currentMaterialId = {{ $material->id }};
@@ -502,7 +500,7 @@
                     slot.dataset.position = i;
 
 
-                    setupDropZone(slot); // ⬅️ PENTING: biar bisa drop
+                   setupParsonsDropZone(slot); 
 
                     answerArea.appendChild(slot);
                     slots.push(slot);
@@ -526,18 +524,30 @@
                     }
                 });
             }
-            zone.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.classList.remove('drag-over');
+            function setupParsonsDropZone(zone) {
+    zone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+    });
 
-                if (!draggedElement) return;
+    zone.addEventListener('dragleave', function () {
+        this.classList.remove('drag-over');
+    });
 
-                // ❗ Jika slot sudah terisi, tolak
-                if (this.querySelector('.code-block')) return;
+    zone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
 
-                this.appendChild(draggedElement);
-                this.classList.add('filled');
-            });
+        if (!draggedElement) return;
+
+        // ❗ SLOT HANYA BOLEH 1 BLOK
+        if (this.querySelector('.code-block')) return;
+
+        this.appendChild(draggedElement);
+        this.classList.add('filled');
+    });
+}
+
 
 
 
@@ -679,29 +689,24 @@
                 this.classList.remove('dragging');
             }
 
-            document.addEventListener('DOMContentLoaded', function() {
-                const answerArea = document.getElementById('answer-area');
+            window.onload = function () {
 
-                answerArea.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = 'move';
-                });
+    // 🔥 CARI SOAL PERTAMA YANG BELUM DIJAWAB
+    const firstUnanswered = document.querySelector('.question-box.unanswered');
 
-                answerArea.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    if (!draggedElement) return;
+    console.log('First unanswered:', firstUnanswered);
 
-                    const placeholder = answerArea.querySelector('.text-muted');
-                    if (placeholder) placeholder.remove();
+    if (firstUnanswered) {
+        loadQuestion(
+            firstUnanswered.dataset.questionId,
+            firstUnanswered.dataset.questionType
+        );
+    } else {
+        console.warn('Tidak ada soal unanswered');
+    }
+};
 
-                    answerArea.appendChild(draggedElement);
-                });
 
-                // 🔥 LOAD SOAL AWAL DARI BACKEND
-                if (START_QUESTION_ID && START_QUESTION_TYPE) {
-                    loadQuestion(START_QUESTION_ID, START_QUESTION_TYPE);
-                }
-            });
 
 
             // Reset Answer
