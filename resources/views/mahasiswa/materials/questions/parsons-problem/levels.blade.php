@@ -357,6 +357,23 @@
             font-weight: 600;
             pointer-events: none;
         }
+
+        .question-box.locked {
+            background: #adb5bd !important;
+            color: #fff;
+            cursor: not-allowed;
+            opacity: 0.7;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .question-box.locked::after {
+            content: "🔒";
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            font-size: 14px;
+        }
     </style>
 
     @push('scripts')
@@ -500,7 +517,7 @@
                     slot.dataset.position = i;
 
 
-                   setupParsonsDropZone(slot); 
+                    setupParsonsDropZone(slot);
 
                     answerArea.appendChild(slot);
                     slots.push(slot);
@@ -524,29 +541,53 @@
                     }
                 });
             }
+
             function setupParsonsDropZone(zone) {
-    zone.addEventListener('dragover', function (e) {
-        e.preventDefault();
-        this.classList.add('drag-over');
-    });
+                zone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('drag-over');
+                });
 
-    zone.addEventListener('dragleave', function () {
-        this.classList.remove('drag-over');
-    });
+                zone.addEventListener('dragleave', function() {
+                    this.classList.remove('drag-over');
+                });
 
-    zone.addEventListener('drop', function (e) {
-        e.preventDefault();
-        this.classList.remove('drag-over');
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drag-over');
 
-        if (!draggedElement) return;
+                    if (!draggedElement) return;
 
-        // ❗ SLOT HANYA BOLEH 1 BLOK
-        if (this.querySelector('.code-block')) return;
+                    // ❗ SLOT HANYA BOLEH 1 BLOK
+                    if (this.querySelector('.code-block')) return;
 
-        this.appendChild(draggedElement);
-        this.classList.add('filled');
-    });
-}
+                    this.appendChild(draggedElement);
+                    this.classList.add('filled');
+                });
+            }
+
+            function updateQuestionAccess() {
+                const boxes = document.querySelectorAll('.question-box');
+                let activeFound = false;
+
+                boxes.forEach(box => {
+                    box.classList.remove('locked');
+                    box.style.pointerEvents = 'none';
+
+                    if (box.classList.contains('answered')) {
+                        return;
+                    }
+
+                    if (!activeFound) {
+                        // 🔓 soal pertama yang belum dijawab
+                        activeFound = true;
+                        box.style.pointerEvents = 'auto';
+                    } else {
+                        // 🔒 soal setelahnya dikunci
+                        box.classList.add('locked');
+                    }
+                });
+            }
 
 
 
@@ -689,22 +730,19 @@
                 this.classList.remove('dragging');
             }
 
-            window.onload = function () {
+            window.onload = function() {
+                const firstUnanswered = document.querySelector('.question-box.unanswered');
 
-    // 🔥 CARI SOAL PERTAMA YANG BELUM DIJAWAB
-    const firstUnanswered = document.querySelector('.question-box.unanswered');
+                if (firstUnanswered) {
+                    loadQuestion(
+                        firstUnanswered.dataset.questionId,
+                        firstUnanswered.dataset.questionType
+                    );
+                }
 
-    console.log('First unanswered:', firstUnanswered);
+                updateQuestionAccess();
+            };
 
-    if (firstUnanswered) {
-        loadQuestion(
-            firstUnanswered.dataset.questionId,
-            firstUnanswered.dataset.questionType
-        );
-    } else {
-        console.warn('Tidak ada soal unanswered');
-    }
-};
 
 
 
@@ -825,6 +863,8 @@
                                     // Hapus class unanswered dan tambah answered
                                     questionBox.classList.remove('unanswered');
                                     questionBox.classList.add('answered', 'disabled');
+                                    updateQuestionAccess();
+
 
                                     // Tambahkan centang icon jika belum ada
                                     if (!questionBox.querySelector('.check-icon')) {
