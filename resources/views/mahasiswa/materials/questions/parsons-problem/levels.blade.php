@@ -325,12 +325,44 @@
             font-size: 16px;
             transition: all 0.3s ease;
         }
+
+        .parsons-slot {
+            background: #f8f9fa;
+            border: 2px dashed #ced4da;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 10px;
+            min-height: 52px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .parsons-slot.drag-over {
+            background: #e7f3ff;
+            border-color: #007bff;
+        }
+
+        .parsons-slot.filled {
+            background: #d4edda;
+            border-color: #28a745;
+            border-style: solid;
+        }
+
+        .parsons-slot-label {
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            font-size: 11px;
+            color: #6c757d;
+            font-weight: 600;
+            pointer-events: none;
+        }
     </style>
 
     @push('scripts')
         <script>
             const START_QUESTION_ID = {{ $startQuestion->id ?? 'null' }};
-    const START_QUESTION_TYPE = "{{ $startQuestion->question_type ?? '' }}";
+            const START_QUESTION_TYPE = "{{ $startQuestion->question_type ?? '' }}";
             let currentQuestion = null;
             let currentQuestionType = null;
             let currentMaterialId = {{ $material->id }};
@@ -339,7 +371,9 @@
 
             // Load Question
             function loadQuestion(questionId, questionType) {
-                currentQuestion = { id: questionId };
+                currentQuestion = {
+                    id: questionId
+                };
                 console.log('Loading question:', questionId, 'Type:', questionType);
 
                 if (!currentMaterialId) {
@@ -397,25 +431,117 @@
                     });
             }
 
-            // Display Parsons Question
             function displayParsonsQuestion(question) {
                 document.getElementById('question-text').textContent = question.question_text;
-                document.getElementById('code-blocks').innerHTML = '';
-                document.getElementById('answer-area').innerHTML =
-                    '<p class="text-muted text-center">Drag blok kode ke sini</p>';
 
-                if (!question.answers || question.answers.length === 0) {
-                    document.getElementById('code-blocks').innerHTML =
-                        '<p class="text-danger">Tidak ada blok kode untuk soal ini</p>';
-                    return;
-                }
+                const codeContainer = document.getElementById('code-blocks');
+                const answerArea = document.getElementById('answer-area');
 
-                // Shuffle answers
-                codeBlocks = shuffleArray([...question.answers]);
-                displayCodeBlocks();
+                codeContainer.innerHTML = '';
+                answerArea.innerHTML = '';
+
+                // pisahkan
+                const autoBlocks = [];
+                const manualBlocks = [];
+
+                question.answers.forEach(ans => {
+                    if (ans.drag_source.trim() === '}') {
+                        autoBlocks.push(ans);
+                    } else {
+                        manualBlocks.push(ans);
+                    }
+                });
+
+                // shuffle hanya manual
+                codeBlocks = shuffleArray(manualBlocks);
+
+                // simpan auto berdasarkan drag_target
+                window.autoParsonsBlocks = autoBlocks.sort(
+                    (a, b) => a.drag_target - b.drag_target
+                );
+
+                renderManualBlocks();
+                renderAutoBlocksAtCorrectPosition();
             }
 
-            // Display Code Blocks
+            function renderManualBlocks() {
+                const container = document.getElementById('code-blocks');
+
+                codeBlocks.forEach(answer => {
+                    const div = document.createElement('div');
+                    div.className = 'code-block';
+                    div.draggable = true;
+                    div.dataset.answerId = answer.id;
+                    div.dataset.dragTarget = answer.drag_target;
+                    div.textContent = answer.drag_source;
+
+                    div.addEventListener('dragstart', handleDragStart);
+                    div.addEventListener('dragend', handleDragEnd);
+
+                    container.appendChild(div);
+                });
+            }
+
+            function renderAutoBlocksAtCorrectPosition() {
+                const answerArea = document.getElementById('answer-area');
+                answerArea.innerHTML = '';
+
+                // 🔑 TOTAL SLOT = MAX drag_target (bukan jumlah blok)
+                const allAnswers = [
+                    ...window.autoParsonsBlocks,
+                    ...codeBlocks
+                ];
+
+                const maxTarget = Math.max(...allAnswers.map(a => a.drag_target));
+
+                const slots = [];
+
+                for (let i = 1; i <= maxTarget; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'parsons-slot drop-zone';
+                    slot.dataset.position = i;
+
+
+                    setupDropZone(slot); // ⬅️ PENTING: biar bisa drop
+
+                    answerArea.appendChild(slot);
+                    slots.push(slot);
+                }
+
+                // 🔒 AUTO DROP KHUSUS "}"
+                window.autoParsonsBlocks.forEach(ans => {
+                    const div = document.createElement('div');
+                    div.className = 'code-block';
+                    div.textContent = ans.drag_source;
+                    div.dataset.answerId = ans.id;
+
+                    div.draggable = false;
+                    div.style.opacity = '0.7';
+                    div.style.cursor = 'default';
+
+                    const targetSlot = slots[ans.drag_target - 1];
+                    if (targetSlot) {
+                        targetSlot.appendChild(div);
+                        targetSlot.classList.add('filled');
+                    }
+                });
+            }
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+
+                if (!draggedElement) return;
+
+                // ❗ Jika slot sudah terisi, tolak
+                if (this.querySelector('.code-block')) return;
+
+                this.appendChild(draggedElement);
+                this.classList.add('filled');
+            });
+
+
+
+
             function displayCodeBlocks() {
                 const container = document.getElementById('code-blocks');
                 container.innerHTML = '';
@@ -426,6 +552,7 @@
                     div.draggable = true;
                     div.dataset.answerId = answer.id;
                     div.dataset.blockIndex = index;
+                    div.dataset.isAuto = answer.drag_source.trim() === '}' ? '1' : '0';
                     div.textContent = answer.drag_source;
 
                     div.addEventListener('dragstart', handleDragStart);
@@ -433,7 +560,30 @@
 
                     container.appendChild(div);
                 });
+
+                // 🔥 AUTO DROP KHUSUS "}"
+                autoPlaceClosingBraces();
             }
+
+            function autoPlaceClosingBraces() {
+                const answerArea = document.getElementById('answer-area');
+                const blocks = document.querySelectorAll('.code-block[data-is-auto="1"]');
+
+                if (blocks.length === 0) return;
+
+                // Hapus placeholder
+                const placeholder = answerArea.querySelector('.text-muted');
+                if (placeholder) placeholder.remove();
+
+                blocks.forEach(block => {
+                    block.draggable = false; // ❗ tidak bisa digeser
+                    block.style.opacity = '0.8';
+                    block.style.cursor = 'default';
+
+                    answerArea.appendChild(block);
+                });
+            }
+
 
             // Display Drag and Drop Question
             function displayDragDropQuestion(question) {
@@ -530,28 +680,28 @@
             }
 
             document.addEventListener('DOMContentLoaded', function() {
-    const answerArea = document.getElementById('answer-area');
+                const answerArea = document.getElementById('answer-area');
 
-    answerArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    });
+                answerArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                });
 
-    answerArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        if (!draggedElement) return;
+                answerArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    if (!draggedElement) return;
 
-        const placeholder = answerArea.querySelector('.text-muted');
-        if (placeholder) placeholder.remove();
+                    const placeholder = answerArea.querySelector('.text-muted');
+                    if (placeholder) placeholder.remove();
 
-        answerArea.appendChild(draggedElement);
-    });
+                    answerArea.appendChild(draggedElement);
+                });
 
-    // 🔥 LOAD SOAL AWAL DARI BACKEND
-    if (START_QUESTION_ID && START_QUESTION_TYPE) {
-        loadQuestion(START_QUESTION_ID, START_QUESTION_TYPE);
-    }
-});
+                // 🔥 LOAD SOAL AWAL DARI BACKEND
+                if (START_QUESTION_ID && START_QUESTION_TYPE) {
+                    loadQuestion(START_QUESTION_ID, START_QUESTION_TYPE);
+                }
+            });
 
 
             // Reset Answer
