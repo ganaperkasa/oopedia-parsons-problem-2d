@@ -173,7 +173,7 @@
                        data-bs-toggle="tooltip"
                        data-bs-placement="bottom"
                        title="Login untuk akses semua soal latihan tanpa batasan">
-                        <i class="fas fa-sign-in-alt me-1"></i> Loginn
+                        <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                     <a href="{{ route('register') }}" class="btn btn-primary btn-sm"
                        data-bs-toggle="tooltip"
