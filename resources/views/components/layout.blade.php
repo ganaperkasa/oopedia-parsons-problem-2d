@@ -37,7 +37,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <!-- CSS Files -->
     <link id="pagestyle" href="{{ asset('assets') }}/css/material-dashboard.css?v=3.0.0" rel="stylesheet" />
-    <script src="https://cdn.tiny.cloud/1/9iw2xqwn1593xsb15d6xpi0y41mtrets5ms0l5s8kekdgf63/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <link href="{{ asset('css/admin-theme.css') }}" rel="stylesheet">
 
     @auth
@@ -76,7 +76,7 @@
                 width: 100%;
                 margin-left: 0;
             }
-            
+
             .g-sidenav-show.g-sidenav-pinned .main-content {
                 margin-left: 280px;
             }
@@ -175,7 +175,7 @@
                 width: 100%;
                 margin-left: 0;
             }
-            
+
             .dashboard-layout.g-sidenav-show.g-sidenav-pinned .main-content {
                 margin-left: 280px;
             }
@@ -226,7 +226,7 @@
         }
 
         /* Text Content Handling */
-        .materi-description, 
+        .materi-description,
         .question-content,
         .answer-content {
             overflow-wrap: break-word;
@@ -394,7 +394,7 @@
         menubar: false,
         height: 400,
         content_style: `
-            body { 
+            body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                 font-size: 16px;
                 line-height: 1.6;
@@ -430,7 +430,7 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         border-left: 5px solid #7b1fa2;
     }
-    
+
     .introjs-button {
         background-color: #7b1fa2;
         color: white;
@@ -438,13 +438,13 @@
         text-shadow: none;
         border-radius: 4px;
     }
-    
+
     .introjs-button:hover, .introjs-button:focus {
         background-color: #9c27b0;
         color: white;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
-    
+
     .introjs-skipbutton {
         color: #666;
         font-size: 20px;
@@ -459,20 +459,20 @@
         border-radius: 50%;
         transition: all 0.2s ease;
     }
-    
+
     .introjs-skipbutton:hover {
         background: rgba(0,0,0,0.1);
         color: #333;
     }
-    
+
     .introjs-progress {
         background-color: #e0e0e0;
     }
-    
+
     .introjs-progressbar {
         background-color: #7b1fa2;
     }
-    
+
     .introjs-helperLayer {
         background-color: rgba(255, 255, 255, 0.7);
         border: none;
@@ -522,35 +522,35 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const loadingOverlay = document.getElementById('loading-overlay');
-    
+
     // Show loading on page load
     showLoading();
-    
+
     // Hide when page is fully loaded
     window.addEventListener('load', function() {
         hideLoading();
     });
-    
+
     // Show loading on navigation
     document.addEventListener('click', function(event) {
         const link = event.target.closest('a');
-        if (link && 
-            link.href && 
-            !link.target && 
-            link.hostname === window.location.hostname && 
-            !link.hasAttribute('data-bs-toggle') && 
+        if (link &&
+            link.href &&
+            !link.target &&
+            link.hostname === window.location.hostname &&
+            !link.hasAttribute('data-bs-toggle') &&
             !link.classList.contains('no-loading')) {
             showLoading();
         }
     });
-    
+
     // Show loading on form submissions
     document.addEventListener('submit', function(event) {
         if (!event.target.classList.contains('ajax-form')) {
             showLoading();
         }
     });
-    
+
     // Intercept fetch requests
     const originalFetch = window.fetch;
     window.fetch = function() {
@@ -565,21 +565,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw error;
             });
     };
-    
+
     // Safety timeout to prevent infinite loading
     let loadingTimeout;
-    
+
     // Helper functions
     window.showLoading = function() {
         loadingOverlay.classList.add('show');
-        
+
         // Set safety timeout
         clearTimeout(loadingTimeout);
         loadingTimeout = setTimeout(() => {
             hideLoading();
         }, 10000); // 10 seconds max
     };
-    
+
     window.hideLoading = function() {
         clearTimeout(loadingTimeout);
         loadingOverlay.classList.remove('show');

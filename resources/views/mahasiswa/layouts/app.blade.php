@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>OOPEDIA - @yield('title')</title>
-    
+
     <link href="https://unpkg.com/intro.js/minified/introjs.min.css" rel="stylesheet">
     <!-- <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script> -->
 
     <!-- Global CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Base CSS -->
     <link href="{{ asset('css/mahasiswa.css') }}" rel="stylesheet">
-    <script src="https://cdn.tiny.cloud/1/9iw2xqwn1593xsb15d6xpi0y41mtrets5ms0l5s8kekdgf63/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/exercise-feedback.css') }}">
-    
+
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
@@ -114,13 +114,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Apply content styling to elements with HTML content
             const contentElements = document.querySelectorAll('.question-text, .answer-text, .answer-explanation');
-            
+
             contentElements.forEach(element => {
                 // Ensure code blocks are properly formatted
                 const codeBlocks = element.querySelectorAll('pre');
                 codeBlocks.forEach(block => {
                     block.classList.add('language-java');
-                    
+
                     // Add proper styling to code blocks
                     if (!block.classList.contains('formatted')) {
                         block.classList.add('formatted');
@@ -131,7 +131,7 @@
                         block.style.overflow = 'auto';
                     }
                 });
-                
+
                 // Format tables if any
                 const tables = element.querySelectorAll('table');
                 tables.forEach(table => {
@@ -162,14 +162,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-            
+
             @yield('content')
         </main>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- TinyMCE Initialization -->
     <script>
         tinymce.init({
@@ -179,7 +179,7 @@
             menubar: false,
             height: 400,
             content_style: `
-                body { 
+                body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                     font-size: 16px;
                     line-height: 1.6;
@@ -207,12 +207,12 @@
             if (document.querySelector('.login-required-modal')) {
                 document.querySelector('.login-required-modal').remove();
             }
-            
+
             // Override behavior pesan login
             window.preventLoginRedirect = function() {
                 return false;
             };
-            
+
             // Override fungsi redirect ke login
             window.redirectToLogin = function() {
                 return false;
@@ -230,49 +230,49 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const loadingOverlay = document.getElementById('loading-overlay');
-        
+
         // Show loading on page load
         showLoading();
-        
+
         // Hide when page is fully loaded
         window.addEventListener('load', function() {
             hideLoading();
         });
-        
+
         // Show loading on navigation
         document.addEventListener('click', function(event) {
             const link = event.target.closest('a');
-            if (link && 
-                link.href && 
-                !link.target && 
-                link.hostname === window.location.hostname && 
-                !link.hasAttribute('data-bs-toggle') && 
+            if (link &&
+                link.href &&
+                !link.target &&
+                link.hostname === window.location.hostname &&
+                !link.hasAttribute('data-bs-toggle') &&
                 !link.classList.contains('no-loading')) {
                 showLoading();
             }
         });
-        
+
         // Show loading on form submissions
         document.addEventListener('submit', function(event) {
             if (!event.target.classList.contains('ajax-form')) {
                 showLoading();
             }
         });
-        
+
         // Safety timeout to prevent infinite loading
         let loadingTimeout;
-        
+
         // Helper functions
         window.showLoading = function() {
             loadingOverlay.classList.add('show');
-            
+
             // Set safety timeout
             clearTimeout(loadingTimeout);
             loadingTimeout = setTimeout(() => {
                 hideLoading();
             }, 10000); // 10 seconds max
         };
-        
+
         window.hideLoading = function() {
             clearTimeout(loadingTimeout);
             loadingOverlay.classList.remove('show');
