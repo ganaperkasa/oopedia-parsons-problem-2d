@@ -14,7 +14,7 @@
 
     <!-- Base CSS -->
     <link href="{{ asset('css/mahasiswa.css') }}" rel="stylesheet">
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="/tinymce/tinymce.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/exercise-feedback.css') }}">
 
