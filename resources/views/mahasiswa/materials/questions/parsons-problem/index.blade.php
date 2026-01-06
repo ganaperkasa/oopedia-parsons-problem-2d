@@ -40,7 +40,7 @@
         <div class="col-md-12 mb-4">
             <a href="{{ route('mahasiswa.materials.questions.levels', $material->id) }}" class="card-link">
                 <div class="material-question-card horizontal">
-                    <!-- Bagian Gambar Material (Kiri) -->
+
                     <div class="material-left-section">
                         @if($material->media && $material->media->isNotEmpty())
                             <div class="material-question-image">
@@ -55,7 +55,6 @@
                         @endif
                     </div>
 
-                    <!-- Bagian Konten (Kanan) -->
                     <div class="material-right-section">
                         <div class="material-top-section">
                             <div class="material-info">
@@ -65,7 +64,6 @@
                                     </div>
                                 </div>
                                 <h2 class="material-question-title">{{ $material->title }}</h2>
-                                <!-- Material Meta Info dengan jumlah mahasiswa sebenarnya -->
                                 <div class="material-meta">
                                     <div class="meta-item">
                                         <i class="fas fa-users"></i>
@@ -74,14 +72,12 @@
                                 </div>
                             </div>
 
-                            <!-- Navigation Icon -->
                             <div class="nav-icon">
                                 <i class="fas fa-chevron-right"></i>
                             </div>
                         </div>
 
                         <div class="material-bottom-section">
-                            <!-- Progress Section -->
                             @if(!auth()->check() || (auth()->check() && auth()->user()->role_id === 4))
                                 <!-- Guest Mode Display -->
                                 <div class="guest-limit-section">
@@ -94,7 +90,6 @@
                                     </div>
                                 </div>
                             @else
-                                <!-- Regular Progress Section for Registered Users -->
                                 <div class="progress-section">
                                     <div class="progress-header">
                                         <span class="progress-label">Progress</span>
@@ -111,7 +106,6 @@
                                 </div>
                             @endif
 
-                            <!-- Action Button -->
                             <div class="btn-start-exercise">
                                 <span>Detail</span>
                             </div>
@@ -126,7 +120,6 @@
 
 @push('css')
 <style>
-/* Perbaikan Gaya Halaman Materi */
 .dashboard-header {
     padding: 2.5rem 0;
     margin-bottom: 2rem;
@@ -162,7 +155,6 @@
     padding: 0 15px;
 }
 
-/* Card Link Styling - Menghilangkan garis bawah */
 .card-link {
     display: block;
     text-decoration: none !important;
@@ -183,7 +175,6 @@
     text-decoration: none !important;
 }
 
-/* Horizontal Card Redesign */
 .material-question-card.horizontal {
     background-color: white;
     border-radius: 15px;
@@ -202,7 +193,6 @@
     box-shadow: 0 0 0 4px rgba(0,87,184,0.2), 0 12px 30px rgba(0,87,184,0.15);
 }
 
-/* Left Section - Image */
 .material-left-section {
     width: 30%;
     overflow: hidden;
@@ -240,7 +230,6 @@
     opacity: 0.5;
 }
 
-/* Right Section - Content */
 .material-right-section {
     width: 70%;
     padding: 15px 20px;
@@ -542,14 +531,12 @@
     gap: 8px;
 }
 
-/* Baris tombol skip (posisi di bawah) */
 .introjs-skipbutton {
-    order: 2; /* Pastikan selalu di bawah */
-    align-self: flex-end; /* Rata kanan */
+    order: 2;
+    align-self: flex-end;
     margin-top: 4px;
 }
 
-/* Gaya dasar semua tombol */
 .introjs-button {
     border-radius: 8px !important;
     padding: 8px 16px !important;
@@ -564,7 +551,7 @@
     font-family: inherit;
 }
 
-/* Tombol Previous */
+
 .introjs-prevbutton {
     background-color: #f5f5f5 !important;
     color: #333 !important;
@@ -575,7 +562,7 @@
     background-color: #e0e0e0 !important;
 }
 
-/* Tombol Next/Done */
+
 .introjs-nextbutton,
 .introjs-donebutton {
     background: var(--gradient-primary) !important;

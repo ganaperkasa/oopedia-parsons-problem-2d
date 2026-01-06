@@ -384,7 +384,6 @@
             let codeBlocks = [];
             let draggedElement = null;
 
-            // Load Question
             function loadQuestion(questionId, questionType) {
                 currentQuestion = {
                     id: questionId
@@ -398,18 +397,15 @@
 
                 currentQuestionType = questionType;
 
-                // Update active indicator
                 document.querySelectorAll('.question-box').forEach(box => {
                     box.classList.remove('active');
                 });
                 const activeBox = document.querySelector(`[data-question-id="${questionId}"]`);
                 if (activeBox) activeBox.classList.add('active');
 
-                // Update header label
                 const label = questionType === 'parsons_problem_2d' ? 'Parsons Problem' : 'Drag and Drop';
                 document.getElementById('question-type-label').textContent = label;
 
-                // Show/hide appropriate content areas
                 if (questionType === 'parsons_problem_2d') {
                     document.getElementById('parsons-content').style.display = 'block';
                     document.getElementById('dragdrop-content').style.display = 'none';
@@ -418,11 +414,9 @@
                     document.getElementById('dragdrop-content').style.display = 'block';
                 }
 
-                // Show loading
                 document.getElementById('question-text').textContent = 'Memuat soal...';
                 document.getElementById('feedback-area').innerHTML = '';
 
-                // Fetch question data
                 const url = `/mahasiswa/materials/${currentMaterialId}/questions/${questionId}/data`;
 
                 fetch(url)
@@ -455,7 +449,6 @@
                 codeContainer.innerHTML = '';
                 answerArea.innerHTML = '';
 
-                // pisahkan
                 const autoBlocks = [];
                 const manualBlocks = [];
 
@@ -467,10 +460,8 @@
                     }
                 });
 
-                // shuffle hanya manual
                 codeBlocks = shuffleArray(manualBlocks);
 
-                // simpan auto berdasarkan drag_target
                 window.autoParsonsBlocks = autoBlocks.sort(
                     (a, b) => a.drag_target - b.drag_target
                 );
@@ -501,7 +492,6 @@
                 const answerArea = document.getElementById('answer-area');
                 answerArea.innerHTML = '';
 
-                // 🔑 TOTAL SLOT = MAX drag_target (bukan jumlah blok)
                 const allAnswers = [
                     ...window.autoParsonsBlocks,
                     ...codeBlocks
@@ -516,14 +506,12 @@
                     slot.className = 'parsons-slot drop-zone';
                     slot.dataset.position = i;
 
-
                     setupParsonsDropZone(slot);
 
                     answerArea.appendChild(slot);
                     slots.push(slot);
                 }
 
-                // 🔒 AUTO DROP KHUSUS "}"
                 window.autoParsonsBlocks.forEach(ans => {
                     const div = document.createElement('div');
                     div.className = 'code-block';
@@ -558,7 +546,6 @@
 
                     if (!draggedElement) return;
 
-                    // ❗ SLOT HANYA BOLEH 1 BLOK
                     if (this.querySelector('.code-block')) return;
 
                     this.appendChild(draggedElement);
@@ -579,19 +566,13 @@
                     }
 
                     if (!activeFound) {
-                        // 🔓 soal pertama yang belum dijawab
                         activeFound = true;
                         box.style.pointerEvents = 'auto';
                     } else {
-                        // 🔒 soal setelahnya dikunci
                         box.classList.add('locked');
                     }
                 });
             }
-
-
-
-
 
             function displayCodeBlocks() {
                 const container = document.getElementById('code-blocks');
@@ -612,7 +593,6 @@
                     container.appendChild(div);
                 });
 
-                // 🔥 AUTO DROP KHUSUS "}"
                 autoPlaceClosingBraces();
             }
 
@@ -622,7 +602,6 @@
 
                 if (blocks.length === 0) return;
 
-                // Hapus placeholder
                 const placeholder = answerArea.querySelector('.text-muted');
                 if (placeholder) placeholder.remove();
 
@@ -635,8 +614,6 @@
                 });
             }
 
-
-            // Display Drag and Drop Question
             function displayDragDropQuestion(question) {
                 document.getElementById('question-text').textContent = question.question_text;
 
@@ -651,7 +628,6 @@
                     return;
                 }
 
-                // Shuffle and display answer options
                 const shuffledAnswers = shuffleArray([...question.answers]);
 
                 shuffledAnswers.forEach((answer, index) => {
@@ -668,7 +644,6 @@
                     optionsContainer.appendChild(div);
                 });
 
-                // Create drop zones based on number of correct answers
                 const correctAnswersCount = question.answers.filter(a => a.is_correct == 1).length;
 
                 for (let i = 0; i < correctAnswersCount; i++) {
@@ -682,7 +657,6 @@
                 }
             }
 
-            // Setup Drop Zone for Drag and Drop
             function setupDropZone(zone) {
                 zone.addEventListener('dragover', function(e) {
                     e.preventDefault();
@@ -706,7 +680,6 @@
                         existingItem.classList.remove('dropped-item');
                     }
 
-                    // Add new item
                     const label = this.querySelector('.drop-zone-label');
                     draggedElement.classList.add('dropped-item');
                     if (label) {
@@ -719,7 +692,6 @@
                 });
             }
 
-            // Drag and Drop Handlers
             function handleDragStart(e) {
                 draggedElement = this;
                 this.classList.add('dragging');
@@ -743,11 +715,6 @@
                 updateQuestionAccess();
             };
 
-
-
-
-
-            // Reset Answer
             function resetAnswer() {
                 if (!currentQuestion) return;
 
@@ -760,7 +727,6 @@
                 document.getElementById('feedback-area').innerHTML = '';
             }
 
-            // Submit Answer
             function submitAnswer() {
                 if (!currentMaterialId || !currentQuestion) {
                     alert('Data tidak lengkap');
@@ -776,7 +742,6 @@
                 }
             }
 
-            // Submit Parsons Answer
             function submitParsonsAnswer(feedbackArea) {
                 const answerArea = document.getElementById('answer-area');
                 const orderedBlocks = answerArea.querySelectorAll('.code-block');
@@ -798,7 +763,6 @@
                 }, feedbackArea);
             }
 
-            // Submit Drag and Drop Answer
             function submitDragDropAnswer(feedbackArea) {
                 const zones = document.querySelectorAll('.drop-zone');
                 const answers = [];
@@ -828,7 +792,6 @@
                 }, feedbackArea);
             }
 
-            // Submit to Server
             function submitToServer(url, data, feedbackArea) {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]');
                 const headers = {
@@ -856,17 +819,13 @@
                         ${data.attempts ? `<small class="d-block mt-2 text-muted">Percobaan ke-${data.attempts}</small>` : ''}
                     </div>
                 `;
-
-                                // 🔥 UPDATE UI LANGSUNG TANPA REFRESH
                                 const questionBox = document.querySelector(`[data-question-id="${currentQuestion.id}"]`);
                                 if (questionBox) {
-                                    // Hapus class unanswered dan tambah answered
                                     questionBox.classList.remove('unanswered');
                                     questionBox.classList.add('answered', 'disabled');
                                     updateQuestionAccess();
 
 
-                                    // Tambahkan centang icon jika belum ada
                                     if (!questionBox.querySelector('.check-icon')) {
                                         const checkIcon = document.createElement('span');
                                         checkIcon.className = 'check-icon';
@@ -874,12 +833,10 @@
                                         questionBox.appendChild(checkIcon);
                                     }
 
-                                    // Hapus event onclick agar tidak bisa diklik lagi
                                     questionBox.removeAttribute('onclick');
                                     questionBox.style.pointerEvents = 'none';
                                 }
 
-                                // Pindah ke soal berikutnya setelah 2 detik
                                 setTimeout(() => {
                                     const allBoxes = document.querySelectorAll('.question-box');
                                     const nextUnanswered = Array.from(allBoxes)
@@ -891,7 +848,6 @@
                                             nextUnanswered.dataset.questionType
                                         );
                                     } else {
-                                        // Semua soal sudah dijawab
                                         feedbackArea.innerHTML = `
                                             <div class="alert alert-success">
                                                 <i class="fas fa-trophy me-2"></i>
@@ -924,7 +880,6 @@
                     });
             }
 
-            // Utility: Shuffle Array
             function shuffleArray(array) {
                 const newArray = [...array];
                 for (let i = newArray.length - 1; i > 0; i--) {
