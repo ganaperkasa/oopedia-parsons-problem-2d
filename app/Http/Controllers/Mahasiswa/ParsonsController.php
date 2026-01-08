@@ -61,7 +61,6 @@ class ParsonsController extends Controller
 
             $progressPercentage = $configuredTotalQuestions > 0 ? min(100, round(($correctAnswers / $configuredTotalQuestions) * 100)) : 0;
 
-            // Ambil jumlah mahasiswa yang sudah mencoba soal ini
             $studentCount = isset($studentCounts[$material->id]) ? $studentCounts[$material->id]->student_count : 0;
 
             $material->progress_percentage = $progressPercentage;
@@ -80,32 +79,25 @@ class ParsonsController extends Controller
         $materials = Material::orderBy('created_at', 'asc')->get();
         $difficulty = $request->query('difficulty', 'parsons');
         $isGuest = !auth()->check() || (auth()->check() && auth()->user()->role_id === 4);
-
-        // Filter questions: hanya ambil question_type = 'parsons_problem'
         $questions = $material
             ->questions()
             ->when($difficulty === 'parsons', function ($query) {
-                // Hanya difficulty parsons → tampilkan parsons_problem_2d + drag_and_drop
                 return $query->where('difficulty', 'parsons')->whereIn('question_type', ['parsons_problem_2d', 'drag_and_drop']);
             })
             ->when($difficulty !== 'parsons', function ($query) use ($difficulty) {
-                // Difficulty beginner / medium / hard → tampilkan normal
                 return $query->where('difficulty', $difficulty);
             })
             ->orderBy('id', 'asc')
             ->get();
 
-        // Log untuk debugging
         \Log::info('Parsons Questions Query', [
             'material_id' => $material->id,
             'difficulty' => $difficulty,
             'count' => $questions->count(),
         ]);
 
-        // Determine which questions have been answered correctly
         $userId = auth()->id() ?? session()->getId();
 
-        // For guests, special handling needed
         if ($isGuest) {
             $answeredQuestionIds = collect([]);
             $guestProgress = session('guest_progress', []);
@@ -134,14 +126,12 @@ class ParsonsController extends Controller
             $answeredQuestionIds = \App\Models\Progress::where('user_id', $userId)->where('material_id', $material->id)->where('is_correct', true)->pluck('question_id');
         }
 
-        // Mark questions as answered or not
         foreach ($questions as $question) {
             $question->is_answered = $answeredQuestionIds->contains($question->id);
         }
 
         $startQuestion = $questions->firstWhere('is_answered', false);
 
-        // fallback kalau semua sudah dijawab
         if (!$startQuestion && $questions->count() > 0) {
             $startQuestion = $questions->first();
         }
@@ -149,37 +139,28 @@ class ParsonsController extends Controller
         return view('mahasiswa.materials.questions.parsons-problem.levels', compact('material', 'materials', 'questions', 'difficulty', 'isGuest', 'startQuestion'));
     }
 
-    /**
-     * Get question data with answers (support parsons_problem_2d & drag_and_drop)
-     */
     public function getQuestionData(Material $material, $questionId)
     {
         try {
-            // Pastikan question belongs to material DAN bertipe parsons_problem_2d ATAU drag_and_drop
             $question = Question::where('material_id', $material->id)
                 ->where('id', $questionId)
                 ->whereIn('question_type', ['parsons_problem_2d', 'drag_and_drop'])
                 ->with([
                     'answers' => function ($query) {
-                        // Untuk parsons: order by drag_target
-                        // Untuk drag_and_drop: order by id (akan di-shuffle di frontend)
                         $query->orderBy('drag_target', 'asc')->orderBy('id', 'asc');
                     },
                 ])
                 ->firstOrFail();
 
-            // Log untuk debugging
             \Log::info('Question Data Loaded', [
                 'question_id' => $question->id,
                 'question_type' => $question->question_type,
                 'answers_count' => $question->answers->count(),
             ]);
 
-            // Format response based on question type
             $answersData = [];
 
             if ($question->question_type === 'parsons_problem_2d') {
-                // Format untuk Parsons Problem
                 $answersData = $question->answers
                     ->map(function ($answer) {
                         return [
@@ -190,7 +171,6 @@ class ParsonsController extends Controller
                     })
                     ->toArray();
             } else {
-                // Format untuk Drag and Drop
                 $answersData = $question->answers
                     ->map(function ($answer) {
                         return [
@@ -364,27 +344,12 @@ class ParsonsController extends Controller
 
         $question = Question::with('answers')->findOrFail($questionId);
 
-        /**
-         * =========================
-         * HITUNG ATTEMPT KE-
-         * =========================
-         */
         $attempt = Progress::where('user_id', $userId)->where('question_id', $questionId)->count() + 1;
 
-        /**
-         * =========================
-         * CEK JAWABAN BENAR / SALAH
-         * =========================
-         */
         $correctOrder = $question->answers()->orderBy(column: 'drag_target')->pluck('id')->toArray();
 
         $isCorrect = $correctOrder === $request->answer_order;
 
-        /**
-         * =========================
-         * SIMPAN KE PROGRESS
-         * =========================
-         */
         Progress::create([
             'user_id' => $userId,
             'material_id' => $materialId,
@@ -402,11 +367,6 @@ class ParsonsController extends Controller
         ]);
     }
 
-    /**
-     * =========================
-     * SUBMIT DRAG & DROP
-     * =========================
-     */
     public function submitDragDrop(Request $request, $materialId)
     {
         $request->validate([
@@ -417,25 +377,11 @@ class ParsonsController extends Controller
         $userId = Auth::id();
         $questionId = $request->question_id;
 
-        /**
-         * =========================
-         * HITUNG ATTEMPT KE-
-         * =========================
-         */
         $attempt = Progress::where('user_id', $userId)->where('question_id', $questionId)->count() + 1;
 
-        /**
-         * =========================
-         * CEK BENAR / SALAH
-         * =========================
-         */
+
         $isCorrect = collect($request->answers)->every(fn($a) => $a['is_correct'] == 1);
 
-        /**
-         * =========================
-         * SIMPAN KE PROGRESS
-         * =========================
-         */
         Progress::create([
             'user_id' => $userId,
             'material_id' => $materialId,

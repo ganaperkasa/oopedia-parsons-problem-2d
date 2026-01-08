@@ -38,7 +38,6 @@ class QuestionController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Format question types for display
         $questions->transform(function ($question) {
             $question->formatted_type = match ($question->question_type) {
                 'fill_in_the_blank' => 'Fill in the Blank',
@@ -62,11 +61,9 @@ class QuestionController extends Controller
     public function create(Material $material = null)
     {
         if ($material) {
-            // If material is provided, only show that material
             $materials = collect([$material]);
             return view('admin.questions.create', compact('materials', 'material'));
         } else {
-            // Otherwise show all materials (for the general create route)
             $materials = Material::all();
             return view('admin.questions.create', compact('materials'));
         }
@@ -74,9 +71,6 @@ class QuestionController extends Controller
 
     public function store(Request $request, Material $material = null)
 {
-    // ================================
-    // VALIDASI DASAR
-    // ================================
     $baseValidation = [
         'question_text' => 'required|string',
         'question_type' => 'required|in:radio_button,drag_and_drop,fill_in_the_blank,parsons_problem_2d',
@@ -85,7 +79,6 @@ class QuestionController extends Controller
         'parsons_mode' => 'nullable|boolean',
     ];
 
-    // Validasi berdasarkan tipe soal
     switch ($request->question_type) {
         case 'parsons_problem_2d':
             $answersValidation = [
@@ -102,7 +95,7 @@ class QuestionController extends Controller
             ];
             break;
 
-        default: // radio_button & drag_and_drop
+        default:
             $answersValidation = [
                 'answers' => 'required|array|min:2',
                 'answers.*.answer_text' => 'required|string',
@@ -112,24 +105,14 @@ class QuestionController extends Controller
 
     $request->validate(array_merge($baseValidation, $answersValidation));
 
-    // ================================
-    // AUTO DIFFICULTY
-    // ================================
     $autoDifficulty = $request->difficulty;
 
-    // Parsons 2D otomatis jadi parsons
     if ($request->question_type === 'parsons_problem_2d') {
         $autoDifficulty = 'parsons';
     }
-
-    // Drag & Drop (parsons mode) → difficulty = parsons
     if ($request->question_type === 'drag_and_drop' && $request->boolean('parsons_mode')) {
         $autoDifficulty = 'parsons';
     }
-
-    // ================================
-    // HANDLE is_correct LOGIC
-    // ================================
     $answers = array_values($request->answers);
 
     // 🔍 DEBUG: Cek data awal
