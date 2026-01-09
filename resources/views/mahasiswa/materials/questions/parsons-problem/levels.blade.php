@@ -162,19 +162,15 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-            /* ➕ tambahan */
             position: relative;
         }
 
-        /* 🔒 SOAL SUDAH DIKERJAKAN */
         .question-box.disabled {
             pointer-events: none;
             cursor: not-allowed;
             opacity: 0.65;
         }
 
-        /* ✅ TANDA CENTANG */
         .question-box .check-icon {
             position: absolute;
             top: -6px;
@@ -220,22 +216,11 @@
             min-height: 300px;
         }
 
-        .code-block {
-            background: white;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            cursor: move;
-            font-family: 'Courier New', monospace;
-            transition: all 0.2s ease;
-            user-select: none;
-        }
+
 
         .code-block:hover {
             background: #f8f9fa;
             border-color: #007bff;
-            transform: translateX(5px);
         }
 
         .code-block.dragging {
@@ -248,7 +233,58 @@
             border-color: #007bff;
         }
 
-        /* Drag and Drop Styles */
+        .code-block {
+            --indent: 0;
+            position: relative;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            margin-left: calc(var(--indent) * 40px);
+            cursor: move;
+            font-family: 'Courier New', monospace;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .code-block::before {
+            content: "";
+            position: absolute;
+            left: -14px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: rgba(0, 123, 255, 0.15);
+            display: none;
+        }
+
+        .code-block.indented::before {
+            content: "";
+            position: absolute;
+            left: -20px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: rgba(0, 123, 255, 0.4);
+            border-radius: 2px;
+        }
+
+        .code-block[data-indent="2"]::before {
+            box-shadow: -40px 0 0 rgba(0, 123, 255, 0.4);
+        }
+
+        .code-block[data-indent="3"]::before {
+            box-shadow: -40px 0 0 rgba(0, 123, 255, 0.4),
+                -80px 0 0 rgba(0, 123, 255, 0.4);
+        }
+
+        .code-block[data-indent="4"]::before {
+            box-shadow: -40px 0 0 rgba(0, 123, 255, 0.4),
+                -80px 0 0 rgba(0, 123, 255, 0.4),
+                -120px 0 0 rgba(0, 123, 255, 0.4);
+        }
+
         .dragdrop-options,
         .dragdrop-zones {
             min-height: 250px;
@@ -285,6 +321,23 @@
             transition: all 0.2s ease;
             position: relative;
         }
+
+        .parsons-slot.drag-over::after {
+            content: "↓ Letakkan di sini";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #007bff;
+            font-size: 12px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .parsons-slot:has(.code-block)::after {
+            display: none;
+        }
+
 
         .drop-zone.drag-over {
             background: #e7f3ff;
@@ -340,12 +393,19 @@
         .parsons-slot.drag-over {
             background: #e7f3ff;
             border-color: #007bff;
+            border-style: solid;
         }
 
         .parsons-slot.filled {
             background: #d4edda;
             border-color: #28a745;
             border-style: solid;
+        }
+
+        .parsons-slot:has(.code-block) {
+            padding: 0;
+            background: transparent;
+            border: none;
         }
 
         .parsons-slot-label {
@@ -385,7 +445,9 @@
             let draggedElement = null;
 
             function loadQuestion(questionId, questionType) {
-                currentQuestion = { id: questionId };
+                currentQuestion = {
+                    id: questionId
+                };
                 console.log('Loading question:', questionId, 'Type:', questionType);
 
                 if (!currentMaterialId) {
@@ -459,10 +521,7 @@
                 });
 
                 codeBlocks = shuffleArray(manualBlocks);
-
-                window.autoParsonsBlocks = autoBlocks.sort(
-                    (a, b) => a.drag_target - b.drag_target
-                );
+                window.autoParsonsBlocks = autoBlocks.sort((a, b) => a.drag_target - b.drag_target);
 
                 renderManualBlocks();
                 renderAutoBlocksAtCorrectPosition();
@@ -470,6 +529,7 @@
 
             function renderManualBlocks() {
                 const container = document.getElementById('code-blocks');
+                container.innerHTML = '';
 
                 codeBlocks.forEach(answer => {
                     const div = document.createElement('div');
@@ -486,47 +546,41 @@
                 });
             }
 
+
             function renderAutoBlocksAtCorrectPosition() {
                 const answerArea = document.getElementById('answer-area');
                 answerArea.innerHTML = '';
 
-                const allAnswers = [
-                    ...window.autoParsonsBlocks,
-                    ...codeBlocks
-                ];
-
+                const allAnswers = [...window.autoParsonsBlocks, ...codeBlocks];
                 const maxTarget = Math.max(...allAnswers.map(a => a.drag_target));
-
-                const slots = [];
 
                 for (let i = 1; i <= maxTarget; i++) {
                     const slot = document.createElement('div');
                     slot.className = 'parsons-slot drop-zone';
                     slot.dataset.position = i;
-
                     setupParsonsDropZone(slot);
-
                     answerArea.appendChild(slot);
-                    slots.push(slot);
                 }
 
                 window.autoParsonsBlocks.forEach(ans => {
                     const div = document.createElement('div');
-                    div.className = 'code-block';
+                    div.className = 'code-block auto-block';
                     div.textContent = ans.drag_source;
                     div.dataset.answerId = ans.id;
-
                     div.draggable = false;
                     div.style.opacity = '0.7';
                     div.style.cursor = 'default';
 
-                    const targetSlot = slots[ans.drag_target - 1];
+                    const targetSlot = answerArea.querySelector(`[data-position="${ans.drag_target}"]`);
                     if (targetSlot) {
                         targetSlot.appendChild(div);
                         targetSlot.classList.add('filled');
                     }
                 });
+
+                updateIndentation();
             }
+
 
             function setupParsonsDropZone(zone) {
                 zone.addEventListener('dragover', function(e) {
@@ -544,12 +598,21 @@
 
                     if (!draggedElement) return;
 
-                    if (this.querySelector('.code-block')) return;
+                    const existingBlock = this.querySelector('.code-block:not(.auto-block)');
+                    if (existingBlock) {
+                        // Swap blocks
+                        const draggedParent = draggedElement.parentElement;
+                        draggedParent.appendChild(existingBlock);
+                    }
 
                     this.appendChild(draggedElement);
                     this.classList.add('filled');
+
+                    console.log('✅ Block dropped to position', this.dataset.position);
+                    updateIndentation();
                 });
             }
+
 
             function updateQuestionAccess() {
                 const boxes = document.querySelectorAll('.question-box');
@@ -571,6 +634,39 @@
                     }
                 });
             }
+
+            function updateIndentation() {
+                const answerArea = document.getElementById('answer-area');
+                const slots = answerArea.querySelectorAll('.parsons-slot');
+                let indentLevel = 0;
+
+                slots.forEach((slot) => {
+                    const block = slot.querySelector('.code-block');
+                    if (!block) return;
+
+                    const text = block.textContent.trim();
+
+                    if (text === '}' || text.startsWith('}')) {
+                        indentLevel = Math.max(indentLevel - 1, 0);
+                    }
+
+                    block.style.setProperty('--indent', indentLevel);
+                    block.dataset.indent = indentLevel;
+
+                    if (indentLevel > 0) {
+                        block.classList.add('indented');
+                    } else {
+                        block.classList.remove('indented');
+                    }
+
+                    if (text.endsWith('{') || text === '{') {
+                        indentLevel++;
+                    }
+                });
+            }
+
+
+
 
             function displayCodeBlocks() {
                 const container = document.getElementById('code-blocks');
@@ -604,7 +700,7 @@
                 if (placeholder) placeholder.remove();
 
                 blocks.forEach(block => {
-                    block.draggable = false; // ❗ tidak bisa digeser
+                    block.draggable = false;
                     block.style.opacity = '0.8';
                     block.style.cursor = 'default';
 
@@ -694,6 +790,7 @@
                 draggedElement = this;
                 this.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
+                console.log(' Dragging:', this.textContent.trim());
             }
 
             function handleDragEnd(e) {
@@ -742,18 +839,17 @@
 
             function submitParsonsAnswer(feedbackArea) {
                 const answerArea = document.getElementById('answer-area');
-                const orderedBlocks = answerArea.querySelectorAll('.code-block');
+                const allBlocks = answerArea.querySelectorAll('.code-block');
 
-                if (orderedBlocks.length === 0) {
-                    feedbackArea.innerHTML =
-                        '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Silakan susun kode terlebih dahulu!</div>';
+                if (allBlocks.length === 0) {
+                    feedbackArea.innerHTML = '<div class="alert alert-warning">Silakan susun kode terlebih dahulu!</div>';
                     return;
                 }
 
-                const currentOrder = Array.from(orderedBlocks).map(block => parseInt(block.dataset.answerId));
+                const currentOrder = Array.from(allBlocks).map(block => parseInt(block.dataset.answerId));
 
                 feedbackArea.innerHTML =
-                    '<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i>Memeriksa jawaban...</div>';
+                    '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Memeriksa jawaban...</div>';
 
                 submitToServer('/mahasiswa/materials/' + currentMaterialId + '/questions/submit-parsons', {
                     question_id: currentQuestion.id,
@@ -793,7 +889,7 @@
             function submitToServer(url, data, feedbackArea) {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]');
                 const headers = {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 };
 
                 if (csrfToken) {
@@ -807,74 +903,38 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success) {
-                            if (data.correct) {
-                                feedbackArea.innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle me-2"></i>
-                        <strong>Jawaban Anda Benar!</strong>
-                        <p class="mb-0 mt-2">${data.explanation || 'Selamat!'}</p>
-                        ${data.attempts ? `<small class="d-block mt-2 text-muted">Percobaan ke-${data.attempts}</small>` : ''}
-                    </div>
-                `;
-                                const questionBox = document.querySelector(`[data-question-id="${currentQuestion.id}"]`);
-                                if (questionBox) {
-                                    questionBox.classList.remove('unanswered');
-                                    questionBox.classList.add('answered', 'disabled');
-                                    updateQuestionAccess();
+                        if (data.success && data.correct) {
+                            feedbackArea.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Jawaban Benar!</strong>
+                    <p class="mt-2">${data.explanation || 'Selamat!'}</p>
+                </div>
+            `;
 
+                            const questionBox = document.querySelector(`[data-question-id="${currentQuestion.id}"]`);
+                            if (questionBox) {
+                                questionBox.classList.remove('unanswered');
+                                questionBox.classList.add('answered', 'disabled');
 
-                                    if (!questionBox.querySelector('.check-icon')) {
-                                        const checkIcon = document.createElement('span');
-                                        checkIcon.className = 'check-icon';
-                                        checkIcon.textContent = '✓';
-                                        questionBox.appendChild(checkIcon);
-                                    }
-
-                                    questionBox.removeAttribute('onclick');
-                                    questionBox.style.pointerEvents = 'none';
-                                }
-
-                                setTimeout(() => {
-                                    const allBoxes = document.querySelectorAll('.question-box');
-                                    const nextUnanswered = Array.from(allBoxes)
-                                        .find(box => !box.classList.contains('answered'));
-
-                                    if (nextUnanswered) {
-                                        loadQuestion(
-                                            nextUnanswered.dataset.questionId,
-                                            nextUnanswered.dataset.questionType
-                                        );
-                                    } else {
-                                        feedbackArea.innerHTML = `
-                                            <div class="alert alert-success">
-                                                <i class="fas fa-trophy me-2"></i>
-                                                <strong>Selamat!</strong>
-                                                <p class="mb-0 mt-2">Anda telah menyelesaikan semua soal!</p>
-                                            </div>
-                                        `;
-                                    }
-                                }, 2000);
-
-                            } else {
-                                feedbackArea.innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-times-circle me-2"></i>
-                        <strong>Jawaban Anda Salah</strong>
-                        <p class="mb-0 mt-2">${data.explanation || 'Silakan coba lagi!'}</p>
-                        ${data.attempts ? `<small class="d-block mt-2 text-muted">Percobaan ke-${data.attempts}</small>` : ''}
-                    </div>
-                `;
+                                const checkIcon = document.createElement('span');
+                                checkIcon.className = 'check-icon';
+                                checkIcon.textContent = '✓';
+                                questionBox.appendChild(checkIcon);
                             }
                         } else {
-                            feedbackArea.innerHTML =
-                                `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${data.message || 'Terjadi kesalahan'}</div>`;
+                            feedbackArea.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-times-circle"></i>
+                    <strong>Jawaban Salah</strong>
+                    <p class="mt-2">${data.explanation || 'Coba lagi!'}</p>
+                </div>
+            `;
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        feedbackArea.innerHTML =
-                            '<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Terjadi kesalahan saat mengirim jawaban</div>';
+                        feedbackArea.innerHTML = '<div class="alert alert-danger">Terjadi kesalahan!</div>';
                     });
             }
 
@@ -886,9 +946,6 @@
                 }
                 return newArray;
             }
-
-
         </script>
     @endpush
 @endsection
-
