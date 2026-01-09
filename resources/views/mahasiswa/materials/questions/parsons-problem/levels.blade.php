@@ -905,37 +905,59 @@
                     .then(data => {
                         if (data.success && data.correct) {
                             feedbackArea.innerHTML = `
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    <strong>Jawaban Benar!</strong>
-                    <p class="mt-2">${data.explanation || 'Selamat!'}</p>
-                </div>
-            `;
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i>
+                                <strong>Jawaban Benar!</strong>
+                                <p class="mt-2">${data.explanation || 'Selamat!'}</p>
+                            </div>
+                        `;
 
-                            const questionBox = document.querySelector(`[data-question-id="${currentQuestion.id}"]`);
+                            const questionBox = document.querySelector(
+                                `[data-question-id="${currentQuestion.id}"]`
+                            );
+
                             if (questionBox) {
                                 questionBox.classList.remove('unanswered');
                                 questionBox.classList.add('answered', 'disabled');
 
-                                const checkIcon = document.createElement('span');
-                                checkIcon.className = 'check-icon';
-                                checkIcon.textContent = '✓';
-                                questionBox.appendChild(checkIcon);
+                                if (!questionBox.querySelector('.check-icon')) {
+                                    const checkIcon = document.createElement('span');
+                                    checkIcon.className = 'check-icon';
+                                    checkIcon.textContent = '✓';
+                                    questionBox.appendChild(checkIcon);
+                                }
                             }
-                        } else {
-                            feedbackArea.innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="fas fa-times-circle"></i>
-                    <strong>Jawaban Salah</strong>
-                    <p class="mt-2">${data.explanation || 'Coba lagi!'}</p>
-                </div>
-            `;
+                            setTimeout(() => {
+                                loadNextQuestion();
+                            }, 800);
                         }
+
                     })
                     .catch(error => {
                         console.error('Error:', error);
                         feedbackArea.innerHTML = '<div class="alert alert-danger">Terjadi kesalahan!</div>';
                     });
+            }
+
+            function loadNextQuestion() {
+                const boxes = Array.from(document.querySelectorAll('.question-box'));
+                const currentIndex = boxes.findIndex(
+                    box => box.dataset.questionId == currentQuestion.id
+                );
+
+                for (let i = currentIndex + 1; i < boxes.length; i++) {
+                    if (!boxes[i].classList.contains('answered')) {
+                        loadQuestion(
+                            boxes[i].dataset.questionId,
+                            boxes[i].dataset.questionType
+                        );
+                        return;
+                    }
+                }
+                document.getElementById('question-text').textContent =
+                    'Semua soal telah diselesaikan!';
+                document.getElementById('parsons-content').style.display = 'none';
+                document.getElementById('dragdrop-content').style.display = 'none';
             }
 
             function shuffleArray(array) {
