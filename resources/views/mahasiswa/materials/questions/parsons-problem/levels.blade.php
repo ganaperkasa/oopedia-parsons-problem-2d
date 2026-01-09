@@ -839,28 +839,26 @@
 
             function submitParsonsAnswer(feedbackArea) {
                 const answerArea = document.getElementById('answer-area');
-                const allBlocks = answerArea.querySelectorAll('.code-block');
-
-                if (allBlocks.length === 0) {
-                    feedbackArea.innerHTML = '<div class="alert alert-warning">Silakan susun kode terlebih dahulu!</div>';
+                const orderedBlocks = answerArea.querySelectorAll('.code-block');
+                if (orderedBlocks.length === 0) {
+                    feedbackArea.innerHTML =
+                        '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Silakan susun kode terlebih dahulu!</div>';
                     return;
                 }
-
-                const currentOrder = Array.from(allBlocks).map(block => parseInt(block.dataset.answerId));
-
+                const currentOrder = Array.from(orderedBlocks).map(block => parseInt(block.dataset.answerId));
                 feedbackArea.innerHTML =
-                    '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Memeriksa jawaban...</div>';
-
+                    '<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i>Memeriksa jawaban...</div>';
                 submitToServer('/mahasiswa/materials/' + currentMaterialId + '/questions/submit-parsons', {
                     question_id: currentQuestion.id,
                     answer_order: currentOrder
                 }, feedbackArea);
             }
 
+
+
             function submitDragDropAnswer(feedbackArea) {
                 const zones = document.querySelectorAll('.drop-zone');
                 const answers = [];
-
                 zones.forEach(zone => {
                     const item = zone.querySelector('.dropped-item');
                     if (item) {
@@ -870,16 +868,13 @@
                         });
                     }
                 });
-
                 if (answers.length === 0) {
                     feedbackArea.innerHTML =
                         '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>Silakan drag jawaban ke area yang tersedia!</div>';
                     return;
                 }
-
                 feedbackArea.innerHTML =
                     '<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i>Memeriksa jawaban...</div>';
-
                 submitToServer('/mahasiswa/materials/' + currentMaterialId + '/questions/submit-dragdrop', {
                     question_id: currentQuestion.id,
                     answers: answers
@@ -889,9 +884,8 @@
             function submitToServer(url, data, feedbackArea) {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]');
                 const headers = {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 };
-
                 if (csrfToken) {
                     headers['X-CSRF-TOKEN'] = csrfToken.getAttribute('content');
                 }
@@ -903,41 +897,93 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success && data.correct) {
-                            feedbackArea.innerHTML = `
-                            <div class="alert alert-success">
-                                <i class="fas fa-check-circle"></i>
-                                <strong>Jawaban Benar!</strong>
-                                <p class="mt-2">${data.explanation || 'Selamat!'}</p>
-                            </div>
-                        `;
+                        if (data.success) {
 
-                            const questionBox = document.querySelector(
-                                `[data-question-id="${currentQuestion.id}"]`
-                            );
+                            if (data.correct) {
+                                feedbackArea.innerHTML = `
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Jawaban Anda Benar!</strong>
+                                    <p class="mb-0 mt-2">${data.explanation || 'Selamat!'}</p>
+                                    ${data.attempts ? `<small class="d-block mt-2 text-muted">
+                                                Percobaan ke-${data.attempts}
+                                            </small>` : ''}
+                                </div>
+                                `;
 
-                            if (questionBox) {
-                                questionBox.classList.remove('unanswered');
-                                questionBox.classList.add('answered', 'disabled');
+                                const questionBox = document.querySelector(
+                                    `[data-question-id="${currentQuestion.id}"]`
+                                );
 
-                                if (!questionBox.querySelector('.check-icon')) {
-                                    const checkIcon = document.createElement('span');
-                                    checkIcon.className = 'check-icon';
-                                    checkIcon.textContent = '✓';
-                                    questionBox.appendChild(checkIcon);
+                                if (questionBox) {
+                                    questionBox.classList.remove('unanswered');
+                                    questionBox.classList.add('answered', 'disabled');
+                                    updateQuestionAccess();
+
+                                    if (!questionBox.querySelector('.check-icon')) {
+                                        const checkIcon = document.createElement('span');
+                                        checkIcon.className = 'check-icon';
+                                        checkIcon.textContent = '✓';
+                                        questionBox.appendChild(checkIcon);
+                                    }
+
+                                    questionBox.removeAttribute('onclick');
+                                    questionBox.style.pointerEvents = 'none';
                                 }
-                            }
-                            setTimeout(() => {
-                                loadNextQuestion();
-                            }, 800);
-                        }
 
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        feedbackArea.innerHTML = '<div class="alert alert-danger">Terjadi kesalahan!</div>';
+                                setTimeout(() => {
+                                    const allBoxes = document.querySelectorAll('.question-box');
+                                    const nextUnanswered = Array.from(allBoxes)
+                                        .find(box => !box.classList.contains('answered'));
+
+                                    if (nextUnanswered) {
+                                        loadQuestion(
+                                            nextUnanswered.dataset.questionId,
+                                            nextUnanswered.dataset.questionType
+                                        );
+                                    } else {
+                                        feedbackArea.innerHTML = `
+                                        <div class="alert alert-success">
+                                            <i class="fas fa-trophy me-2"></i>
+                                            <strong>Selamat!</strong>
+                                            <p class="mb-0 mt-2">Anda telah menyelesaikan semua soal!</p>
+                                        </div>
+                                        `;
+                                                                            }
+                                                                        }, 2000);
+
+                                                                    } else {
+                                                                        // ❌ SALAH → ✅ SUDAH DIPERBAIKI
+                                                                        feedbackArea.innerHTML = `
+                                        <div class="alert alert-danger">
+                                            <i class="fas fa-times-circle me-2"></i>
+                                            <strong>Jawaban Anda Salah</strong>
+                                            <p class="mb-0 mt-2">${data.explanation || 'Silakan coba lagi!'}</p>
+                                        </div>
+                                        `;
+                                                                    }
+
+                                                                } else {
+                                                                    // ❌ SALAH → ✅ SUDAH DIPERBAIKI
+                                                                    feedbackArea.innerHTML = `
+                                        <div class="alert alert-danger">
+                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                            ${data.message || 'Terjadi kesalahan'}
+                                        </div>
+                                        `;
+                                                                }
+                                                            })
+                                                            .catch(error => {
+                                                                console.error('Error:', error);
+                                                                feedbackArea.innerHTML = `
+                                        <div class="alert alert-danger">
+                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                            Terjadi kesalahan server
+                                        </div>
+                                        `;
                     });
             }
+
 
             function loadNextQuestion() {
                 const boxes = Array.from(document.querySelectorAll('.question-box'));
