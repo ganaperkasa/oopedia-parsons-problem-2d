@@ -953,7 +953,6 @@
                                                                         }, 2000);
 
                                                                     } else {
-                                                                        // ❌ SALAH → ✅ SUDAH DIPERBAIKI
                                                                         feedbackArea.innerHTML = `
                                         <div class="alert alert-danger">
                                             <i class="fas fa-times-circle me-2"></i>
@@ -964,7 +963,6 @@
                                                                     }
 
                                                                 } else {
-                                                                    // ❌ SALAH → ✅ SUDAH DIPERBAIKI
                                                                     feedbackArea.innerHTML = `
                                         <div class="alert alert-danger">
                                             <i class="fas fa-exclamation-circle me-2"></i>
