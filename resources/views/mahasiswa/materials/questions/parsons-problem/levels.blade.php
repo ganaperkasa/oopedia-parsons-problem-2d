@@ -385,9 +385,7 @@
             let draggedElement = null;
 
             function loadQuestion(questionId, questionType) {
-                currentQuestion = {
-                    id: questionId
-                };
+                currentQuestion = { id: questionId };
                 console.log('Loading question:', questionId, 'Type:', questionType);
 
                 if (!currentMaterialId) {
@@ -888,6 +886,9 @@
                 }
                 return newArray;
             }
+
+
         </script>
     @endpush
 @endsection
+
