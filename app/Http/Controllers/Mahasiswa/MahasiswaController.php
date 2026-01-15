@@ -118,21 +118,20 @@ class MahasiswaController extends Controller
                 $userScores[$userId] = 0;
             }
 
-            // SISTEM POIN DASAR: Nilai berdasarkan kesulitan
             $basePoin = 0;
             switch ($answer->difficulty) {
                 case 'parsons':
-                    $basePoin = 10; // Soal beginner = 5 poin
+                    $basePoin = 20;
                     break;
                 case 'medium':
-                    $basePoin = 10; // Soal medium = 10 poin
+                    $basePoin = 10;
                     break;
                 case 'hard':
-                    $basePoin = 15; // Soal hard = 15 poin
+                    $basePoin = 15; 
                     break;
             }
 
-            // SISTEM BONUS/PENALTI: Berdasarkan jumlah percobaan
+            
             $attemptMultiplier = 1.0; // Default untuk percobaan pertama
 
             if ($attempts == 1) {
